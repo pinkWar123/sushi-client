@@ -12,6 +12,7 @@ import {
   Typography,
 } from "antd";
 import React, { FunctionComponent } from "react";
+import EarningsChart from "./EarningChart";
 
 export interface DashboardPageProps {}
 
@@ -135,6 +136,9 @@ const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
               ]}
             />
           </Flex>
+          <div className="p-4 rounded-lg shadow-lg bg-white">
+            <EarningsChart />
+          </div>
         </Col>
         <Col span={8}>
           <Card>
