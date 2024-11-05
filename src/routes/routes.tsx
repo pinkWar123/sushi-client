@@ -9,7 +9,9 @@ export const PUBLIC_ROUTES = [
     components: [
       {
         path: "",
-        component: lazy(() => import("../pages/DashboardPages/DashboardPage")),
+        component: lazy(
+          () => import("../pages/DashboardPages/Dashboard/DashboardPage")
+        ),
       },
     ],
   },
