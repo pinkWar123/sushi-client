@@ -21,12 +21,19 @@ export const AppRoutes = () => {
 
         <Suspense fallback={<Spin />}>
           <Routes>
-            {PUBLIC_ROUTES.map((route) => (
+            {PUBLIC_ROUTES.map((group) => (
               <Route
-                key={`route-${route.path}`}
-                path={route.path}
-                Component={route.component}
-              />
+                key={`route-${group.path}`}
+                path={group.path}
+                element={group.layout}
+              >
+                {group.components.map((component) => (
+                  <Route
+                    path={component.path}
+                    Component={component.component}
+                  />
+                ))}
+              </Route>
             ))}
           </Routes>
         </Suspense>
