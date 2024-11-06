@@ -99,7 +99,7 @@ const DashboardLayoutSidebar: FunctionComponent<
       className="bg-neutral-50 start-0 h-screen fixed top-18 "
       width={"15%"}
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <NavigateItem
           {...item}
           isActive={item.title.toLowerCase() === lastSegment}
