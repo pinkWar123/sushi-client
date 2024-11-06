@@ -81,7 +81,10 @@ const DashboardLayoutSidebar: FunctionComponent<
   DashboardLayoutSidebarProps
 > = () => {
   return (
-    <Sider className="bg-neutral-50" width={"15%"}>
+    <Sider
+      className="bg-neutral-50 start-0 h-screen fixed top-18 "
+      width={"15%"}
+    >
       {items.map((item, index) => (
         <NavigateItem {...item} isActive={index === 0} />
       ))}
