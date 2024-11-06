@@ -1,4 +1,10 @@
 export const PATH = {
   HOME: "/",
-  DASHBOARD: "/dashboard",
+  DASHBOARD: {
+    path: "dashboard",
+    outlet: {
+      index: "",
+      menu: "menu",
+    },
+  },
 };

@@ -1,6 +1,6 @@
 import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Avatar, Flex, Space } from "antd";
+import { Avatar, Flex, Form, Select, Space } from "antd";
 import { Header } from "antd/es/layout/layout";
 import Search from "antd/es/transfer/search";
 import { FunctionComponent } from "react";
@@ -13,8 +13,8 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
       <Flex justify="space-between">
         <Space>
           <strong className=" ">Foody.io</strong>
-          <div className="ml-40">
-            <Search placeholder="Search..." />
+          <div className="flex items-center">
+            <Select placeholder="Choose a branch..." />
           </div>
         </Space>
         <Space>
