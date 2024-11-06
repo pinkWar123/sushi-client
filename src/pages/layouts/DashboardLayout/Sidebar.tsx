@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Space } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { FunctionComponent } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface DashboardLayoutSidebarProps {}
 
@@ -51,11 +52,21 @@ const items: NavigateItemProps[] = [
 const NavigateItem: FunctionComponent<NavigateItemProps> = (
   props: NavigateItemProps
 ) => {
+  const navigate = useNavigate();
   return (
     <div
       className={`py-2 cursor-pointer ${
         props.isActive ? "text-violet-700 " : "text-zinc-400"
       }`}
+      onClick={() =>
+        navigate(
+          `/dashboard/${
+            props.title.toLowerCase() === "dashboard"
+              ? ""
+              : props.title.toLowerCase()
+          }`
+        )
+      }
     >
       <div
         className={`h-1/2 ${
@@ -80,13 +91,19 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
 const DashboardLayoutSidebar: FunctionComponent<
   DashboardLayoutSidebarProps
 > = () => {
+  const location = useLocation();
+  const pathSegments = location.pathname.split("/");
+  const lastSegment = pathSegments[pathSegments.length - 1];
   return (
     <Sider
       className="bg-neutral-50 start-0 h-screen fixed top-18 "
       width={"15%"}
     >
       {items.map((item, index) => (
-        <NavigateItem {...item} isActive={index === 0} />
+        <NavigateItem
+          {...item}
+          isActive={item.title.toLowerCase() === lastSegment}
+        />
       ))}
       <div className=" mt-40">
         <Divider />
