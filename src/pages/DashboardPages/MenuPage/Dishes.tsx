@@ -1,4 +1,4 @@
-import { Card, Col, Flex, Form, Row, Typography } from "antd";
+import { Col, Flex, Form, Row, Typography } from "antd";
 import { FunctionComponent, useState } from "react";
 import DishItem from "./DishItem";
 import Search from "antd/es/transfer/search";
