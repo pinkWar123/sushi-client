@@ -5,8 +5,9 @@ export const PATH = {
     outlet: {
       index: "",
       menu: "menu",
-      order: "order",
+      order: "orders",
       employee: "employee",
+      customer: "customers",
     },
   },
 };
