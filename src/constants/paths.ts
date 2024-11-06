@@ -6,6 +6,7 @@ export const PATH = {
       index: "",
       menu: "menu",
       order: "order",
+      employee: "employee",
     },
   },
 };

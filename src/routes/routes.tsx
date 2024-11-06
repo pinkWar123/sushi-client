@@ -25,6 +25,12 @@ export const PUBLIC_ROUTES = [
           () => import("../pages/DashboardPages/OrderPage/OrderPage")
         ),
       },
+      {
+        path: PATH.DASHBOARD.outlet.employee,
+        component: lazy(
+          () => import("../pages/DashboardPages/EmployeePage/EmployeePage")
+        ),
+      },
     ],
   },
 ];
