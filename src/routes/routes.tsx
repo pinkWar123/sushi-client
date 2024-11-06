@@ -10,13 +10,19 @@ export const PUBLIC_ROUTES = [
       {
         path: PATH.DASHBOARD.outlet.index,
         component: lazy(
-          () => import("../pages/DashboardPages/Dashboard/DashboardPage")
+          () => import("../pages/DashboardPages/DashboardPage/DashboardPage")
         ),
       },
       {
         path: PATH.DASHBOARD.outlet.menu,
         component: lazy(
           () => import("../pages/DashboardPages/MenuPage/MenuPage")
+        ),
+      },
+      {
+        path: PATH.DASHBOARD.outlet.order,
+        component: lazy(
+          () => import("../pages/DashboardPages/OrderPage/OrderPage")
         ),
       },
     ],
