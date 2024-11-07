@@ -1,10 +1,8 @@
 import { faStickyNote } from "@fortawesome/free-regular-svg-icons";
 import {
-  faChartLine,
   faCog,
   faGauge,
   faHamburger,
-  faHouse,
   faSignOutAlt,
   faUsers,
   faUsersLine,
