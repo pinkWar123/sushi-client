@@ -7,6 +7,7 @@ import {
   faHouse,
   faSignOutAlt,
   faUsers,
+  faUsersLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Divider, Space } from "antd";
@@ -27,14 +28,10 @@ const items: NavigateItemProps[] = [
     icon: <FontAwesomeIcon icon={faGauge} />,
     title: "Dashboard",
   },
-  {
-    icon: <FontAwesomeIcon icon={faHouse} />,
-    title: "Home",
-  },
-  {
-    icon: <FontAwesomeIcon icon={faChartLine} />,
-    title: "Report",
-  },
+  // {
+  //   icon: <FontAwesomeIcon icon={faChartLine} />,
+  //   title: "Report",
+  // },
   {
     icon: <FontAwesomeIcon icon={faStickyNote} />,
     title: "Orders",
@@ -42,6 +39,10 @@ const items: NavigateItemProps[] = [
   {
     icon: <FontAwesomeIcon icon={faHamburger} />,
     title: "Menu",
+  },
+  {
+    icon: <FontAwesomeIcon icon={faUsersLine} />,
+    title: "Employee",
   },
   {
     icon: <FontAwesomeIcon icon={faUsers} />,
@@ -60,10 +61,10 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
       }`}
       onClick={() =>
         navigate(
-          `/dashboard/${
+          `/dashboard${
             props.title.toLowerCase() === "dashboard"
               ? ""
-              : props.title.toLowerCase()
+              : "/" + props.title.toLowerCase()
           }`
         )
       }

@@ -1,8 +1,8 @@
-import { Spin } from "antd";
 import { Suspense } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { PUBLIC_ROUTES } from "./routes";
+import { Loading } from "../components/Loading";
 
 const helmetContext = {};
 
@@ -19,7 +19,7 @@ export const AppRoutes = () => {
           />
         </Helmet>
 
-        <Suspense fallback={<Spin />}>
+        <Suspense fallback={<Loading />}>
           <Routes>
             {PUBLIC_ROUTES.map((group) => (
               <Route

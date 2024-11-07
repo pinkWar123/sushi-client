@@ -15,11 +15,8 @@ const DashboardLayout: FunctionComponent<DashboardLayoutProps> = () => {
       </div>
       <Layout hasSider className="h-full">
         <DashboardLayoutSidebar />
-        <Content
-          style={{ marginInlineStart: 180 }}
-          className="flex justify-center "
-        >
-          <div className="w-11/12 mt-4 ">
+        <Content className="ml-[15%] flex justify-center ">
+          <div className="w-11/12 mt-4 min-h-dvh">
             <Outlet />
           </div>
         </Content>

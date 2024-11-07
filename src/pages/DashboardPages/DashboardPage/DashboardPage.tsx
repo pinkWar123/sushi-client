@@ -48,7 +48,7 @@ const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
                 icon={faDollarSign}
               />
             </Flex>
-            <div className="flex items-center ml-2 mt-2">
+            <div className="flex justify-center items-center ml-2 mt-2">
               <strong>$10,236</strong>
               <Space size={"small"} className="text-green-400 text-xs ml-2  ">
                 <FontAwesomeIcon className="mt-2" icon={faSortUp} />
@@ -88,7 +88,7 @@ const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
                 icon={faDollarSign}
               />
             </Flex>
-            <div className="flex items-center ml-2 mt-2">
+            <div className="flex justify-center items-center ml-2 mt-2">
               <strong>$10,236</strong>
               <Space size={"small"} className="text-green-400 text-xs ml-2  ">
                 <FontAwesomeIcon className="mt-2" icon={faSortUp} />
@@ -108,7 +108,7 @@ const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
                 icon={faDollarSign}
               />
             </Flex>
-            <div className="flex items-center ml-2 mt-2">
+            <div className="flex justify-center items-center ml-2 mt-2">
               <strong>$10,236</strong>
               <Space size={"small"} className="text-green-400 text-xs ml-2  ">
                 <FontAwesomeIcon className="mt-2" icon={faSortUp} />
