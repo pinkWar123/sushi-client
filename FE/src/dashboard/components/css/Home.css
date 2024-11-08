@@ -1,0 +1,12 @@
+#introduction {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 200px;
+    height: 100%;
+}
+#home-image {
+    width: 50%;
+    /* background-color: aquamarine; */
+}
