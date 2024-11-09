@@ -1,0 +1,28 @@
+.box-container {
+    position: relative;
+    margin-bottom: 2vh;
+}
+.input-container {
+    width: 100%;
+    padding: 1vw;
+    border: 1px solid black;
+    border-radius: 15px;
+}
+.input-label {
+    position: absolute;
+    left: 3%;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 5px;
+}
+
+.input-container:focus + .input-label{
+    top: -4%;
+    background-color: white;
+}
+
+.input-container:not(:placeholder-shown) + .input-label{
+    top: -4%;
+    background-color: white;
+}
