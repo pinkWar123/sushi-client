@@ -10,4 +10,10 @@ export const PATH = {
       customer: "customers",
     },
   },
+  AUTH: {
+    path: "auth",
+    outlet: {
+      login: "login",
+    },
+  },
 };
