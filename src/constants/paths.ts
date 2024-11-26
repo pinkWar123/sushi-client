@@ -7,25 +7,25 @@ export const PATH = {
       menu: "menu",
       order: "orders",
       employee: "employee",
-      customer: "customers"
+      customer: "customers",
     },
   },
   LOGIN: {
-    path: 'login',
+    path: "login",
     outlet: {
-      index: ""
-    }
+      index: "",
+    },
   },
   REGISTER: {
-    path: 'register',
+    path: "register",
     outlet: {
-      index: ""
-    }
+      index: "",
+    },
   },
   WELCOME: {
-    path: 'welcome',
+    path: "welcome",
     outlet: {
-      index: ""
-    }
-  }
+      index: "",
+    },
+  },
 };
