@@ -60,3 +60,17 @@
     padding-top: 15%;
     /* background-color: aqua; */
 }
+.error-login-container {
+    /* background-color: gold; */
+    width: 100%;
+    height: 5vh;
+}
+
+.error-message-login {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: red;
+}

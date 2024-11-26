@@ -1,17 +1,19 @@
 import './Button.css'
 
 interface ButtonProps {
-    type: "button" | "submit" | "reset";
+    type: 'button' | 'submit' | 'reset'; // Define the type of button
     content: string;
+    disabled?: boolean; // Add the disabled property
 }
 
-function Button({
-    type,
-    content
-}: ButtonProps) {
+
+function Button({ type, content, disabled }: ButtonProps) {
     return (
-        <button type={type} className="btn">{content}</button>
-    )
+        <button className='btn' type={type} disabled={disabled}>
+            {content}
+        </button>
+    );
 }
+
 
 export default Button
