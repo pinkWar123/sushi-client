@@ -15,15 +15,27 @@ import {
   Avatar,
   Flex,
   Form,
+  Input,
+  PaginationProps,
   Select,
   Space,
   Table,
   TableProps,
   Typography,
 } from "antd";
-import Search from "antd/es/transfer/search";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import EmployeeEditDrawer from "./EmployeeEditDrawer";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import { Loading } from "../../../components/Loading";
+import { IEmployee } from "../../../@types/response/employee";
+import {
+  fetchEmployee,
+  resetPagination,
+  selectEmployee,
+  updatePageSize,
+} from "../../../redux/employeeSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { IEmployeeQuery } from "../../../@types/request/request";
 
 interface EmployeePageProps {}
 
@@ -47,60 +59,37 @@ interface Employee {
   branch: string;
 }
 
-const EMPLOYEES: Employee[] = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    department: "chef",
-    contact: "alice.johnson@example.com",
-    joinedDate: "15 Jan, 2023",
-    branch: "Downtown",
-  },
-  {
-    id: "2",
-    name: "Bob Smith",
-    department: "waiter",
-    contact: "bob.smith@example.com",
-    joinedDate: "22 Nov, 2022",
-    branch: "Uptown",
-  },
-  {
-    id: "3",
-    name: "Carol Evans",
-    department: "cashier",
-    contact: "carol.evans@example.com",
-    joinedDate: "05 Jun, 2021",
-    branch: "Midtown",
-  },
-  {
-    id: "4",
-    name: "David Brown",
-    department: "chef",
-    contact: "david.brown@example.com",
-    joinedDate: "10 Mar, 2023",
-    branch: "Downtown",
-  },
-  {
-    id: "5",
-    name: "Eve Thompson",
-    department: "waiter",
-    contact: "eve.thompson@example.com",
-    joinedDate: "12 Sep, 2022",
-    branch: "Suburbs",
-  },
-  {
-    id: "6",
-    name: "Frank White",
-    department: "cashier",
-    contact: "frank.white@example.com",
-    joinedDate: "18 Apr, 2020",
-    branch: "Uptown",
-  },
-];
-
 const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
-  const columns: TableProps<Employee>["columns"] = [
+  const [form] = Form.useForm<IEmployeeQuery>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activeEmployee, setActiveEmployee] = useState<IEmployee>();
+  const {
+    data: employee,
+    loading,
+    pageNumber,
+    pageSize,
+    totalRecords,
+  } = useAppSelector(selectEmployee);
+  const dispatch = useAppDispatch();
+  const query = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const queryObj: IEmployeeQuery = {
+      pageNumber: parseInt(params.get("pageNumber") ?? "") || pageNumber,
+      pageSize: parseInt(params.get("pageSize") ?? "") || pageSize,
+    };
+    const name = params.get("name");
+    if (name) {
+      queryObj.name = name;
+    }
+    return queryObj;
+  }, [location.search]);
+  useEffect(() => {
+    dispatch(fetchEmployee(query));
+  }, [dispatch, query]);
+
+  const columns: TableProps<IEmployee>["columns"] = [
     {
       title: "ID",
       dataIndex: "id",
@@ -173,12 +162,15 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
     {
       title: "Action",
       key: "action",
-      render: () => (
+      render: (_, record) => (
         <Space>
           <FontAwesomeIcon
             className="text-green-400 cursor-pointer"
             icon={faPenToSquare}
-            onClick={() => setShowDrawer(true)}
+            onClick={() => {
+              setShowDrawer(true);
+              setActiveEmployee(record);
+            }}
           />
           <FontAwesomeIcon
             className="text-red-600 cursor-pointer"
@@ -188,19 +180,64 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
       ),
     },
   ];
+  const handleSearch = () => {
+    const filters = form.getFieldsValue();
+    const params = new URLSearchParams(location.search);
+    params.delete("pageNumber");
+    params.delete("pageSize");
+    if (filters.name) params.set("name", filters.name);
+    else params.delete("name");
+    dispatch(resetPagination());
+    navigate({
+      pathname: location.pathname,
+      search: params.toString(),
+    });
+  };
+  const handleChangePage = (pageNumber: number) => {
+    const search = new URLSearchParams(location.search);
+    search.set("pageNumber", pageNumber.toString());
+    search.set("pageSize", pageSize.toString());
+    navigate({
+      pathname: location.pathname,
+      search: search.toString(),
+    });
+  };
+  const handleChangePageSize: PaginationProps["onShowSizeChange"] = (
+    current: number,
+    size: number
+  ) => {
+    // dispatch(resetPagination());
+    // dispatch(updatePageSize(size));
+    const search = new URLSearchParams(location.search);
+    search.set("pageSize", size.toString());
+    search.set("pageNumber", "1");
+    navigate({
+      pathname: location.pathname,
+      search: search.toString(),
+    });
+  };
+  if (loading) return <Loading />;
   return (
     <>
-      {showDrawer && <EmployeeEditDrawer onHide={() => setShowDrawer(false)} />}
+      {showDrawer && activeEmployee && (
+        <EmployeeEditDrawer
+          employee={activeEmployee}
+          onHide={() => {
+            setShowDrawer(false);
+            setActiveEmployee(undefined);
+          }}
+        />
+      )}
       <Flex justify="space-between">
         <Typography.Title level={3}>Employee</Typography.Title>
         <div className="rounded-md py-1 px-4 h-fit text-white text-sm bg-violet-400 cursor-pointer">
           <FontAwesomeIcon icon={faUserPlus} /> Add employee
         </div>
       </Flex>
-      <Form layout="inline">
+      <Form layout="inline" form={form}>
         <Space>
-          <Form.Item className="w-64">
-            <Search placeholder="Employee name" />
+          <Form.Item className="w-64" name={"name"}>
+            <Input placeholder="Employee name" onPressEnter={handleSearch} />
           </Form.Item>
           <Form.Item className="w-32">
             <Select
@@ -213,7 +250,19 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
           </Form.Item>
         </Space>
       </Form>
-      <Table dataSource={EMPLOYEES} columns={columns} />
+      <Table
+        dataSource={employee}
+        onChange={(config) => {
+          handleChangePage(config.current ?? 1);
+        }}
+        columns={columns}
+        pagination={{
+          current: pageNumber,
+          pageSize: pageSize,
+          total: totalRecords,
+          onShowSizeChange: handleChangePageSize,
+        }}
+      />
     </>
   );
 };

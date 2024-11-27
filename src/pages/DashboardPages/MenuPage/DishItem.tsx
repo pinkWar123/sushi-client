@@ -1,22 +1,27 @@
 import { App, Avatar, Card, Flex, Rate, Typography } from "antd";
 import { FunctionComponent, useState } from "react";
 import EditDishModal from "./EditDishModal";
+import { IDish } from "../../../@types/response/menu";
 
-interface DishItemProps {}
+interface DishItemProps {
+  item: IDish;
+  sectionId: string | null;
+}
 
-const DishItem: FunctionComponent<DishItemProps> = () => {
+const DishItem: FunctionComponent<DishItemProps> = ({ item, sectionId }) => {
   const [editModel, toggleEditMode] = useState<boolean>(false);
   const { modal } = App.useApp();
   return (
     <>
       {editModel && (
         <EditDishModal
-          name="Chicken sandwich"
+          sectionId={sectionId}
+          name={item.dishName}
           description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum ipsa
           provident, quas cum exercitationem repudiandae consectetur quam quae
           vero. A nesciunt rem asperiores fuga voluptates, dolorem labore facere
           laborum esse."
-          price={25}
+          price={item.currentPrice}
           onHide={() => toggleEditMode(false)}
         />
       )}
@@ -26,7 +31,7 @@ const DishItem: FunctionComponent<DishItemProps> = () => {
             ellipsis={{ rows: 1 }}
             className="rounded-full text-white bg-green-700 ring-2 px-2"
           >
-            $25.00
+            ${item.currentPrice}
           </Typography.Paragraph>
         </Flex>
         <Flex className="mt-4" justify="center">
@@ -37,7 +42,7 @@ const DishItem: FunctionComponent<DishItemProps> = () => {
         </Flex>
         <Flex justify="center">
           <Typography.Paragraph ellipsis={{ rows: 1 }}>
-            <strong className="text-center">Chicken sandwich</strong>
+            <strong className="text-center">{item.dishName}</strong>
           </Typography.Paragraph>
         </Flex>
         <Flex justify="center">
