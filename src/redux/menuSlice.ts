@@ -1,12 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { IDish, ISection } from "../@types/response/menu";
-import {
-  callGetAllDishes,
-  callGetDishBySections,
-  callGetSections,
-} from "../services/menu";
+import { callGetAllDishes, callGetSections } from "../services/menu";
 import { IDishesQuery } from "../@types/request/request";
-import { IPagedResponse, IResponse } from "../@types/response/response";
+import { IPagedResponse } from "../@types/response/response";
 import { RootState } from "./store";
 import { IPagedSelector } from "../@types/redux";
 

@@ -1,7 +1,7 @@
 export const PATH = {
   HOME: "/",
   DASHBOARD: {
-    path: "dashboard",
+    path: "/:branchId/dashboard",
     outlet: {
       index: "",
       menu: "menu",

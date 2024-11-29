@@ -59,10 +59,10 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
       }`}
       onClick={() =>
         navigate(
-          `/dashboard${
+          `${
             props.title.toLowerCase() === "dashboard"
               ? ""
-              : "/" + props.title.toLowerCase()
+              : "./" + props.title.toLowerCase()
           }`
         )
       }

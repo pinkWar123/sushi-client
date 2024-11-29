@@ -18,3 +18,8 @@ export interface IDishesQuery extends IBasePaginatedQuery {
 }
 
 export interface ICustomerQuery extends IBasePaginatedQuery {}
+
+export interface IDetailedReservationCardsQuery {
+  branchId: string;
+  datedOn: string;
+}
