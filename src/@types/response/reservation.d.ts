@@ -7,6 +7,7 @@ export interface IReservation {
   customerName: string;
   branchId: string;
   branchName: string;
+  orderId: string;
   status: OrderStatus;
   datedOn: string;
   tableNumber: number;

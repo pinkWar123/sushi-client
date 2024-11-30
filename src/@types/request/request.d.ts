@@ -23,3 +23,8 @@ export interface IDetailedReservationCardsQuery {
   branchId: string;
   datedOn: string;
 }
+
+export interface ICreateInvoiceQuery {
+  orderId: string;
+  paymentMethod: "Cash" | "Credit";
+}

@@ -14,6 +14,7 @@ import { FunctionComponent, useCallback, useEffect } from "react";
 import OrderItem from "./OrderItem";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import {
+  changeStatus,
   fetchReservations,
   selectReservationData,
 } from "../../../redux/reservationSlice";
@@ -21,6 +22,8 @@ import { IDetailedReservationCardsQuery } from "../../../@types/request/request"
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc"; // Import the utc plugin
+import { statuses } from "../../../utils/enums";
+import { OrderStatus } from "../../../constants/order";
 
 export interface OrderPageProps {}
 
@@ -29,7 +32,7 @@ dayjs.extend(utc);
 const dateFormat = "YYYY-MM-DD";
 const OrderPage: FunctionComponent<OrderPageProps> = () => {
   const dispatch = useAppDispatch();
-  const { loading, data } = useAppSelector(selectReservationData);
+  const { loading, data, status } = useAppSelector(selectReservationData);
   const location = useLocation();
   const navigate = useNavigate();
   const { branchId } = useParams();
@@ -59,6 +62,16 @@ const OrderPage: FunctionComponent<OrderPageProps> = () => {
     }
   };
 
+  const renderOrders = () => {
+    const satisfiedData = data.filter((order) => order.status === status);
+    if (satisfiedData.length === 0) return <Empty />;
+    return satisfiedData.map((item, index) => (
+      <Col className="mb-4" span={8} key={`order-${index}`}>
+        <OrderItem info={item} />
+      </Col>
+    ));
+  };
+
   useEffect(() => {
     console.log(getDate().toISOString());
     const query: IDetailedReservationCardsQuery = {
@@ -74,15 +87,24 @@ const OrderPage: FunctionComponent<OrderPageProps> = () => {
       <Typography.Title level={2}>Orders</Typography.Title>
       <Flex justify="space-between">
         <Space>
-          <div className="bg-white rounded-md py-1 px-2 cursor-pointer text-xs">
-            All
-          </div>
-          <div className="bg-green-800 text-white rounded-md py-1 px-2 cursor-pointer text-xs">
-            On Process
-          </div>
-          <div className="bg-white rounded-md py-1 px-2 cursor-pointer text-xs">
-            Completed
-          </div>
+          {statuses.map((_status) => {
+            if (_status[1] === status)
+              return (
+                <div className="bg-green-800 text-white rounded-md py-1 px-2 cursor-pointer text-xs">
+                  {_status[0]}
+                </div>
+              );
+            return (
+              <div
+                className="bg-white rounded-md py-1 px-2 cursor-pointer text-xs"
+                onClick={() =>
+                  dispatch(changeStatus(_status[1] as OrderStatus))
+                }
+              >
+                {_status[0]}
+              </div>
+            );
+          })}
         </Space>
         <div className="flex gap-2">
           <Form.Item label="Date">
@@ -101,11 +123,7 @@ const OrderPage: FunctionComponent<OrderPageProps> = () => {
         <Empty />
       ) : (
         <Row className="mt-4" gutter={8}>
-          {data.map((item, index) => (
-            <Col className="mb-4" span={8} key={`order-${index}`}>
-              <OrderItem info={item} />
-            </Col>
-          ))}
+          {renderOrders()}
         </Row>
       )}
     </>

@@ -1,3 +1,5 @@
+import { IReservation } from "./reservation";
+
 export interface IOrderDetail {
   orderDishId: string;
   price: number;

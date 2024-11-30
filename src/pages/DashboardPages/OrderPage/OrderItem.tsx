@@ -45,7 +45,9 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
           onHide={() => setShowDetail(false)}
         />
       )}
-      {showBills && <PaymentModal onHide={() => setShowBills(false)} />}
+      {showBills && (
+        <PaymentModal info={info} onHide={() => setShowBills(false)} />
+      )}
       <Card>
         <Flex gap={"middle"}>
           <Avatar shape="square" className="bg-green-600">
