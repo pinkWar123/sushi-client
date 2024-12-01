@@ -39,6 +39,39 @@ export const PUBLIC_ROUTES = [
       },
     ],
   },
+  {
+    path: PATH.LOGIN.path,
+    components: [
+      {
+        path: PATH.LOGIN.outlet.index,
+        component: lazy(
+          () => import("../pages/Login/Login")
+        ),
+      },
+    ]
+  },
+  {
+    path: PATH.REGISTER.path,
+    components: [
+      {
+        path: PATH.REGISTER.outlet.index,
+        component: lazy(
+          () => import ('../pages/Register/Register')
+        )
+      }
+    ]
+  },
+  {
+    path: PATH.WELCOME.path,
+    components: [
+      {
+        path: PATH.WELCOME.outlet.index,
+        component: lazy(
+          () => import ('../pages/ClientPages/ClientDashboard/Dashboard')
+        )
+      }
+    ]
+  }
 ];
 
 export const PRIVATE_ROUTES = [];
