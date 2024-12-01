@@ -6,7 +6,7 @@ import {
   IDetailedReservationCardsQuery,
 } from "../@types/request/request";
 import { callGetDetailedReservationCards } from "../services/reservation";
-import { callCreateNewInvoice } from "../services/invoice";
+import { callCreateNewInvoice, callPurchaseInvoice } from "../services/invoice";
 import { OrderStatus } from "../constants/order";
 
 export interface ReservationState {
@@ -36,8 +36,21 @@ export const createInvoice = createAsyncThunk(
   "create-invoice",
   async (query: ICreateInvoiceQuery) => {
     const res = await callCreateNewInvoice(query);
-    console.log(res);
-    return res;
+    return res.data;
+  }
+);
+
+interface IPurchaseInvoice {
+  invoiceId: string;
+  reservationId: string;
+}
+
+export const purchaseInvoice = createAsyncThunk(
+  "update-invoice",
+  async (data: IPurchaseInvoice) => {
+    const { invoiceId, reservationId } = data;
+    await callPurchaseInvoice(invoiceId);
+    return reservationId;
   }
 );
 
@@ -78,6 +91,17 @@ const reservationSlice = createSlice({
       })
       .addCase(createInvoice.rejected, (state) => {
         state.createInvoiceLoading = false;
+      })
+      .addCase(purchaseInvoice.fulfilled, (state, action) => {
+        const reservationId = action.payload;
+        state.data = state.data.map((reservation) =>
+          reservation.reservationId === reservationId
+            ? {
+                ...reservation,
+                status: OrderStatus.Done,
+              }
+            : reservation
+        );
       });
   },
 });

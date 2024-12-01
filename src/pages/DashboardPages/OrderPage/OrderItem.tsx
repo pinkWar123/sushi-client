@@ -10,29 +10,6 @@ interface OrderItemProps {
   info: IReservation;
 }
 
-const details = [
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-];
-
 const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [showBills, setShowBills] = useState<boolean>(false);

@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   Divider,
   Flex,
@@ -20,6 +21,10 @@ import {
   selectReservationData,
 } from "../../../redux/reservationSlice";
 import { ICreateInvoiceQuery } from "../../../@types/request/request";
+import Invoice from "./Invoice";
+import { ICreateInvoiceResponse } from "../../../@types/response/invoice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface PaymentModalProps {
   onHide: () => void;
@@ -107,8 +112,11 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
     },
   ];
   const [paymentMethod, setPaymentMethod] = useState<"Credit" | "Cash">("Cash");
+  const [invoice, setInvoice] = useState<ICreateInvoiceResponse>();
   const dispatch = useAppDispatch();
-  const { createInvoiceLoading } = useAppSelector(selectReservationData);
+  const { createInvoiceLoading } = useAppSelector(
+    (state) => state.reservations
+  );
 
   const handleCreateInvoice = async () => {
     const query: ICreateInvoiceQuery = {
@@ -118,10 +126,11 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
     console.log(query);
     try {
       const result = await dispatch(createInvoice(query)).unwrap();
+      console.log(result);
       message.success(
         `Create invoice for order ${result.orderId} successfully`
       );
-      onHide();
+      setInvoice(result);
     } catch (error) {
       console.log(error);
       message.error("Create invoice failed");
@@ -136,10 +145,10 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
       className="w-50"
       width={"80%"}
       open
+      footer={null}
       title="Invoice Details"
-      okText="Create invoice"
-      onOk={handleCreateInvoice}
-      okButtonProps={{ loading: createInvoiceLoading }}
+      maskClosable={false}
+      keyboard={false}
     >
       <>
         <Flex justify="space-between">
@@ -166,15 +175,6 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
           <strong>{info.totalPrice}</strong>
         </Flex>
         <Flex justify="space-between" className="py-1">
-          <strong>Discount:</strong>
-          <strong>20%</strong>
-        </Flex>
-        <Divider></Divider>
-        <Flex justify="space-between" className="py-1">
-          <strong>Total:</strong>
-          <strong>{info.totalPrice}</strong>
-        </Flex>
-        <Flex justify="space-between" className="py-1">
           <strong>Payment method:</strong>
           <Form.Item>
             <Select
@@ -192,6 +192,28 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
               ]}
             />
           </Form.Item>
+        </Flex>
+
+        {!invoice && (
+          <Button
+            loading={createInvoiceLoading}
+            type="primary"
+            className="w-full"
+            icon={<FontAwesomeIcon icon={faPlus} />}
+            onClick={handleCreateInvoice}
+          >
+            Create invoice
+          </Button>
+        )}
+
+        <Flex justify="center">
+          {invoice && (
+            <Invoice
+              info={invoice}
+              reservationId={info.reservationId}
+              onHide={onHide}
+            />
+          )}
         </Flex>
       </>
     </Modal>

@@ -10,7 +10,7 @@ const invoiceApi = axios.create({
 
 export const callCreateNewInvoice = async (query: ICreateInvoiceQuery) => {
   return (
-    await invoiceApi.post<ICreateInvoiceResponse>(
+    await invoiceApi.post<IResponse<ICreateInvoiceResponse>>(
       "createInvoice",
       {},
       {
@@ -18,4 +18,8 @@ export const callCreateNewInvoice = async (query: ICreateInvoiceQuery) => {
       }
     )
   ).data;
+};
+
+export const callPurchaseInvoice = async (invoiceId: string) => {
+  return (await invoiceApi.patch(`UpdatePaidInvoice/${invoiceId}`)).data;
 };
