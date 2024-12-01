@@ -124,21 +124,7 @@ const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
 
       <Row gutter={16} className="mt-8">
         <Col span={16}>
-          <Flex justify="space-between">
-            <Typography.Title level={3}>Summary</Typography.Title>
-            <Select
-              value={"last_week"}
-              options={[
-                {
-                  label: "Last week",
-                  value: "last_week",
-                },
-              ]}
-            />
-          </Flex>
-          <div className="p-4 rounded-lg shadow-lg bg-white">
-            <EarningsChart />
-          </div>
+          <EarningsChart />
         </Col>
         <Col span={8}>
           <Card>

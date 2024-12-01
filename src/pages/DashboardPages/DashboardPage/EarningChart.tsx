@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,6 +12,11 @@ import {
   ChartData,
   ScriptableContext,
 } from "chart.js";
+import { DatePicker, Flex, TimeRangePickerProps, Typography } from "antd";
+import dayjs, { Dayjs } from "dayjs";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import { getRevenueByDateRange } from "../../../redux/branchSlice";
+import { useParams } from "react-router-dom";
 
 ChartJS.register(
   LineElement,
@@ -22,90 +27,67 @@ ChartJS.register(
   CategoryScale
 );
 
+const initialDates: [Dayjs, Dayjs] = [
+  dayjs().subtract(7, "days"), // Start date: 7 days ago
+  dayjs(), // End date: Today
+];
+
 const EarningsChart: React.FC = () => {
-  const data: ChartData<"line", number[], string> = {
-    labels: [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ],
-    datasets: [
-      {
-        label: "Earning",
-        data: [1500, 3000, 5000, 5900, 4000, 4500, 5000] as number[], // Ensure data is of type number[]
-        fill: true,
-        backgroundColor: (context: ScriptableContext<"line">) => {
-          const chart = context.chart;
-          const { ctx, chartArea } = chart;
+  const { branchId } = useParams();
+  const data = useAppSelector((state) => state.branches.revenue);
+  const options = useAppSelector((state) => state.branches.options);
+  const dispatch = useAppDispatch();
+  const rangePresets: TimeRangePickerProps["presets"] = [
+    { label: "Last 7 Days", value: [dayjs().add(-7, "d"), dayjs()] },
+    { label: "Last 14 Days", value: [dayjs().add(-14, "d"), dayjs()] },
+    { label: "Last 30 Days", value: [dayjs().add(-30, "d"), dayjs()] },
+    { label: "Last 90 Days", value: [dayjs().add(-90, "d"), dayjs()] },
+  ];
 
-          if (!chartArea) {
-            return "rgba(91, 84, 220, 0)";
-          }
-          const gradient = ctx.createLinearGradient(
-            0,
-            chartArea.top,
-            0,
-            chartArea.bottom
-          );
-          gradient.addColorStop(0, "rgba(91, 84, 220, 0.3)");
-          gradient.addColorStop(1, "rgba(91, 84, 220, 0)");
-          return gradient;
-        },
-        borderColor: "#5B54DC",
-        tension: 0.4,
-        pointBackgroundColor: "#5B54DC",
-        pointBorderColor: "#fff",
-        pointHoverRadius: 6,
-        pointRadius: 4,
-      },
-    ],
+  const onRangeChange = (
+    dates: null | (Dayjs | null)[],
+    dateStrings: string[]
+  ) => {
+    if (dates) {
+      console.log("From: ", dates[0], ", to: ", dates[1]);
+      console.log("From: ", dateStrings[0], ", to: ", dateStrings[1]);
+      dispatch(
+        getRevenueByDateRange({
+          branchId: branchId ?? "",
+          startDate: dateStrings[0],
+          endDate: dateStrings[1],
+        })
+      );
+    } else {
+      console.log("Clear");
+    }
   };
 
-  const options: ChartOptions<"line"> = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: "#5B54DC",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        padding: 10,
-        displayColors: false,
-        callbacks: {
-          label: (tooltipItem) => `${tooltipItem.raw}K Earning`,
-        },
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 2,
-          color: "#A8A8A8",
-          callback: (value: number | string) => `${value}k`, // Only number here
-        },
-        grid: {
-          color: "rgba(168, 168, 168, 0.3)",
-        },
-      },
-      x: {
-        ticks: {
-          color: "#A8A8A8",
-        },
-        grid: {
-          display: false,
-        },
-      },
-    },
-  };
+  useEffect(() => {
+    dispatch(
+      getRevenueByDateRange({
+        branchId: branchId ?? "",
+        startDate: initialDates[0].toString(),
+        endDate: initialDates[1].toString(),
+      })
+    );
+  }, [dispatch]);
 
-  return <Line data={data} options={options} />;
+  return (
+    <div>
+      <Flex justify="space-between">
+        <Typography.Title level={3}>Summary</Typography.Title>
+        <DatePicker.RangePicker
+          defaultValue={initialDates}
+          presets={rangePresets}
+          onChange={onRangeChange}
+        />
+      </Flex>
+      <div className="p-4 rounded-lg shadow-lg bg-white">
+        <Line data={data} options={options} />
+      </div>
+    </div>
+  );
 };
 
 export default EarningsChart;

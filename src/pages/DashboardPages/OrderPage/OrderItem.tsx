@@ -3,60 +3,60 @@ import { FunctionComponent, useState } from "react";
 import Status from "./Status";
 import OrderDetail from "./OrderDetail";
 import PaymentModal from "./PaymentModal";
+import { IReservation } from "../../../@types/response/reservation";
+import { formattedDate, formattedTime } from "../../../utils/time";
 
-interface OrderItemProps {}
+interface OrderItemProps {
+  info: IReservation;
+}
 
-const details = [
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-  },
-];
-
-const OrderItem: FunctionComponent<OrderItemProps> = () => {
+const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [showBills, setShowBills] = useState<boolean>(false);
   return (
     <>
-      {showDetail && <OrderDetail onHide={() => setShowDetail(false)} />}
-      {showBills && <PaymentModal onHide={() => setShowBills(false)} />}
+      {showDetail && (
+        <OrderDetail
+          reservationId={info.reservationId}
+          details={info.orderDetails}
+          onHide={() => setShowDetail(false)}
+        />
+      )}
+      {showBills && (
+        <PaymentModal info={info} onHide={() => setShowBills(false)} />
+      )}
       <Card>
         <Flex gap={"middle"}>
           <Avatar shape="square" className="bg-green-600">
-            A4
+            {info.tableNumber}
           </Avatar>
           <Flex justify="space-between" className="flex-1">
             <div>
-              <div className="font-bold">Ariel Hikmat</div>
-              <div className="text-xs text-gray-400 flex justify-between">
-                <div>Order #025 / Dine in</div>
-              </div>
+              <div className="font-bold">{info.customerName}</div>
+              {/* <div className="text-xs text-gray-400 flex justify-between">
+                Reservation : {info.reservationId}
+              </div> */}
+              <Typography.Paragraph
+                ellipsis={{
+                  rows: 1,
+                  tooltip: true,
+                }}
+                className="text-xs text-gray-400 w-2/3 justify-between"
+              >
+                {info.reservationId}
+              </Typography.Paragraph>
             </div>
             <div>
-              <Status status="ready" />
-              <div className="text-xs text-gray-400 text-right">3 people</div>
+              <Status status={info.status} />
+              <div className="text-xs text-gray-400 text-right">
+                {info.totalPeople} {info.totalPeople > 1 ? "people" : "person"}
+              </div>
             </div>
           </Flex>
         </Flex>
         <Flex className="mt-2 text-xs" justify="space-between">
-          <div>Wed, July 12, 2023</div>
-          <div>06:12 PM</div>
+          <div>{formattedDate(info.datedOn)}</div>
+          <div>{formattedTime(info.datedOn)}</div>
         </Flex>
         <hr className="py-2 mt-2" />
         <div className="h-36 overflow-hidden">
@@ -71,14 +71,14 @@ const OrderItem: FunctionComponent<OrderItemProps> = () => {
               Price
             </Col>
           </Row>
-          {details.map((detail, index) => (
-            <Row key={`${detail.name}-${index}`} className="py-2">
+          {info.orderDetails.slice(0, 3).map((detail, index) => (
+            <Row key={`${detail.dishName}-${index}`} className="py-2">
               <Col span={12}>
                 <Typography.Paragraph
                   className="text-xs"
                   ellipsis={{ rows: 1 }}
                 >
-                  {detail.name}
+                  {detail.dishName}
                 </Typography.Paragraph>
               </Col>
               <Col span={3} className="text-center">
@@ -101,11 +101,15 @@ const OrderItem: FunctionComponent<OrderItemProps> = () => {
           ))}
         </div>
         <Divider orientation="center">
-          <span className="text-xs">+3 more</span>
+          {info.orderDetails.length > 3 && (
+            <span className="text-xs">
+              +{info.orderDetails.length - 3} more
+            </span>
+          )}
         </Divider>
         <Flex justify="space-between">
           <div className="font-bold">Total</div>
-          <div className="font-bold">$87.34</div>
+          <div className="font-bold">${info.totalPrice}</div>
         </Flex>
 
         <Row gutter={16} className="mt-4" justify="center">

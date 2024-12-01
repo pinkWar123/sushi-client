@@ -1,0 +1,25 @@
+#about-column-content {
+    /* background-color: aqua; */
+    height: 75vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#title-col {
+    font-family: montserrat;
+    font-weight: bold;
+    font-size: 1.5rem;
+    padding: 10px;
+    
+}
+
+#image-col {
+    height: 70%;
+    border-radius: 150px;
+    object-fit: cover;
+    transition: 0.9s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+#image-col:hover {
+    scale: 0.95;
+}

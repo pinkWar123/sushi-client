@@ -1,47 +1,25 @@
 import { Modal, Select, Table, TableProps } from "antd";
 import { FunctionComponent } from "react";
+import { IOrderDetail } from "../../../@types/response/order";
+import { OrderStatus } from "../../../constants/order";
 
 interface OrderDetailProps {
   onHide: () => void;
+  details: IOrderDetail[];
+  reservationId: string;
 }
-interface DishProps {
-  name: string;
-  quantity: number;
-  price: number;
-  status: "in-progress" | "completed" | "ready";
-}
-const details: DishProps[] = [
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-    status: "completed",
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-    status: "in-progress",
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-    status: "completed",
-  },
-  {
-    name: "Scrambled eggs with toast",
-    quantity: 1,
-    price: 16.99,
-    status: "ready",
-  },
-];
+interface DishProps extends IOrderDetail {}
 
 const columns: TableProps<DishProps>["columns"] = [
   {
     title: "Dish",
-    dataIndex: "name",
+    dataIndex: "dishName",
     key: "dish",
+  },
+  {
+    title: "Id",
+    dataIndex: "dishId",
+    key: "dishId",
   },
   {
     title: "Price",
@@ -53,34 +31,20 @@ const columns: TableProps<DishProps>["columns"] = [
     dataIndex: "quantity",
     key: "quantity",
   },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (value) => (
-      <Select
-        value={value}
-        options={[
-          {
-            label: "In Progress",
-            value: "in-progress",
-          },
-          {
-            label: "Completed",
-            value: "completed",
-          },
-          {
-            label: "Ready",
-            value: "ready",
-          },
-        ]}
-      />
-    ),
-  },
 ];
-const OrderDetail: FunctionComponent<OrderDetailProps> = ({ onHide }) => {
+const OrderDetail: FunctionComponent<OrderDetailProps> = ({
+  onHide,
+  reservationId,
+  details,
+}) => {
   return (
-    <Modal open title="Order detail #25" onCancel={onHide} onClose={onHide}>
+    <Modal
+      open
+      width={"50%"}
+      title={`Reservation ${reservationId}`}
+      onCancel={onHide}
+      onClose={onHide}
+    >
       <Table pagination={false} columns={columns} dataSource={details} />
     </Modal>
   );

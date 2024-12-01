@@ -1,10 +1,12 @@
 import { Form, Input, InputNumber, Modal, Select } from "antd";
 import { FunctionComponent } from "react";
+import { useAppSelector } from "../../../hooks/redux";
 
 interface DishProps {
   name: string;
   description: string;
   price: number;
+  sectionId: string | null;
 }
 
 interface EditDishModalProps extends DishProps {
@@ -16,8 +18,10 @@ const EditDishModal: FunctionComponent<EditDishModalProps> = ({
   name,
   description,
   price,
+  sectionId,
 }) => {
   const [form] = Form.useForm<DishProps>();
+  const sections = useAppSelector((state) => state.menu.sections);
   return (
     <Modal onCancel={onHide} onClose={onHide} open title="Update dish">
       <Form
@@ -26,6 +30,7 @@ const EditDishModal: FunctionComponent<EditDishModalProps> = ({
           name,
           description,
           price,
+          section: sectionId,
         }}
         layout="vertical"
       >
@@ -38,8 +43,15 @@ const EditDishModal: FunctionComponent<EditDishModalProps> = ({
         <Form.Item label="Description" name={"description"}>
           <Input.TextArea rows={4} placeholder="Description..." />
         </Form.Item>
-        <Form.Item label="Section" name={"branch"}>
-          <Select placeholder="Choose a section that the dish may belong to..." />
+        <Form.Item label="Section" name={"section"}>
+          <Select
+            value={sectionId}
+            placeholder="Choose a section that the dish may belong to..."
+            options={sections.map((section) => ({
+              label: section.sectionName,
+              value: section.sectionId,
+            }))}
+          />
         </Form.Item>
       </Form>
     </Modal>

@@ -1,144 +1,142 @@
 import {
+  Button,
   Card,
-  Col,
-  DatePicker,
   Divider,
   Flex,
   Form,
-  Input,
+  message,
   Modal,
-  Row,
   Select,
   Table,
   TableProps,
   Typography,
 } from "antd";
 import { FunctionComponent, useState } from "react";
-
-const CLIENTS = [
-  {
-    name: "Nguyen Hong Quan",
-    address: "40 Hoang Dieu, p13, q4, HCM",
-  },
-  {
-    name: "Nguyen Phuc Thanh",
-    address: "20 An Duong Vuong, p1, q8, HCM",
-  },
-];
-
-interface DataType {
-  title: string;
-  quantity: number;
-  price: number;
-  total: number;
-}
-
-const DATA: DataType[] = [
-  {
-    title:
-      "Sushiasddlsaasdlksdaklsadjlkadsjkldaskljsdajlkadsjkladsjlkadjkladsljk",
-    quantity: 2,
-    price: 20,
-    total: 40,
-  },
-  {
-    title: "Sushi",
-    quantity: 2,
-    price: 20,
-    total: 40,
-  },
-  {
-    title: "Sushi",
-    quantity: 2,
-    price: 20,
-    total: 40,
-  },
-];
-
-const columns: TableProps<DataType>["columns"] = [
-  {
-    title: (
-      <Typography.Text ellipsis className="font-normal">
-        Dish
-      </Typography.Text>
-    ),
-    dataIndex: "title",
-    key: "title",
-    render: (value) => (
-      <Typography.Text
-        ellipsis={{ tooltip: true }}
-        className="text-xs font-bold w-24"
-      >
-        {value}
-      </Typography.Text>
-    ),
-    width: "50%",
-  },
-  {
-    title: (
-      <Typography.Text ellipsis={{ tooltip: true }} className="font-normal">
-        Price
-      </Typography.Text>
-    ),
-    dataIndex: "price",
-    key: "price",
-    render: (value) => (
-      <Typography.Text
-        ellipsis={{ tooltip: true }}
-        className="text-xs font-bold"
-      >
-        {value}
-      </Typography.Text>
-    ),
-    width: "20%",
-  },
-  {
-    width: "10%",
-    title: (
-      <Typography.Text
-        ellipsis={{ tooltip: true }}
-        className="font-normal w-10"
-      >
-        Qty
-      </Typography.Text>
-    ),
-    dataIndex: "quantity",
-    key: "quantity",
-    render: (value) => (
-      <Typography.Text
-        ellipsis={{ tooltip: true }}
-        className="text-xs font-bold"
-      >
-        {value}
-      </Typography.Text>
-    ),
-  },
-  {
-    title: (
-      <Typography.Text ellipsis={{ tooltip: true }} className="font-normal">
-        Total
-      </Typography.Text>
-    ),
-    dataIndex: "total",
-    key: "total",
-    render: (value) => (
-      <Typography.Text
-        ellipsis={{ tooltip: true }}
-        className="text-xs font-bold"
-      >
-        {value}
-      </Typography.Text>
-    ),
-    width: "20%",
-  },
-];
+import { formattedDate } from "../../../utils/time";
+import { IReservation } from "../../../@types/response/reservation";
+import { IOrderDetail } from "../../../@types/response/order";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import {
+  createInvoice,
+  selectReservationData,
+} from "../../../redux/reservationSlice";
+import { ICreateInvoiceQuery } from "../../../@types/request/request";
+import Invoice from "./Invoice";
+import { ICreateInvoiceResponse } from "../../../@types/response/invoice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface PaymentModalProps {
   onHide: () => void;
+  info: IReservation;
 }
 
-const PaymentModal: FunctionComponent<PaymentModalProps> = ({ onHide }) => {
-  const [activeClient, setActiveClient] = useState<number>();
+const PaymentModal: FunctionComponent<PaymentModalProps> = ({
+  onHide,
+  info,
+}) => {
+  const columns: TableProps<IOrderDetail>["columns"] = [
+    {
+      title: (
+        <Typography.Text ellipsis className="font-normal">
+          Dish
+        </Typography.Text>
+      ),
+      dataIndex: "dishName",
+      key: "Dish",
+      render: (value) => (
+        <Typography.Text
+          ellipsis={{ tooltip: true }}
+          className="text-xs font-bold w-24"
+        >
+          {value}
+        </Typography.Text>
+      ),
+      width: "50%",
+    },
+    {
+      title: (
+        <Typography.Text ellipsis={{ tooltip: true }} className="font-normal">
+          Price
+        </Typography.Text>
+      ),
+      dataIndex: "price",
+      key: "price",
+      render: (value) => (
+        <Typography.Text
+          ellipsis={{ tooltip: true }}
+          className="text-xs font-bold"
+        >
+          {value}
+        </Typography.Text>
+      ),
+      width: "20%",
+    },
+    {
+      width: "10%",
+      title: (
+        <Typography.Text
+          ellipsis={{ tooltip: true }}
+          className="font-normal w-10"
+        >
+          Qty
+        </Typography.Text>
+      ),
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (value) => (
+        <Typography.Text
+          ellipsis={{ tooltip: true }}
+          className="text-xs font-bold"
+        >
+          {value}
+        </Typography.Text>
+      ),
+    },
+    {
+      title: (
+        <Typography.Text ellipsis={{ tooltip: true }} className="font-normal">
+          Total
+        </Typography.Text>
+      ),
+      key: "total",
+      render: (_, record) => (
+        <Typography.Text
+          ellipsis={{ tooltip: true }}
+          className="text-xs font-bold"
+        >
+          {record.price * record.quantity}
+        </Typography.Text>
+      ),
+      width: "20%",
+    },
+  ];
+  const [paymentMethod, setPaymentMethod] = useState<"Credit" | "Cash">("Cash");
+  const [invoice, setInvoice] = useState<ICreateInvoiceResponse>();
+  const dispatch = useAppDispatch();
+  const { createInvoiceLoading } = useAppSelector(
+    (state) => state.reservations
+  );
+
+  const handleCreateInvoice = async () => {
+    const query: ICreateInvoiceQuery = {
+      paymentMethod,
+      orderId: info.orderId,
+    };
+    console.log(query);
+    try {
+      const result = await dispatch(createInvoice(query)).unwrap();
+      console.log(result);
+      message.success(
+        `Create invoice for order ${result.orderId} successfully`
+      );
+      setInvoice(result);
+    } catch (error) {
+      console.log(error);
+      message.error("Create invoice failed");
+    }
+  };
+
   return (
     <Modal
       onCancel={onHide}
@@ -147,74 +145,77 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({ onHide }) => {
       className="w-50"
       width={"80%"}
       open
+      footer={null}
       title="Invoice Details"
+      maskClosable={false}
+      keyboard={false}
     >
-      <Row gutter={16}>
-        <Col span={12} className="p-8">
-          <Form layout="vertical">
-            <Form.Item label="ID Invoice">
-              <Input prefix="#" value={"2304-ZAK"} />
-            </Form.Item>
-            <Form.Item label="Date">
-              <DatePicker />
-            </Form.Item>
-            <Typography.Title level={3}>Bill Payment</Typography.Title>
-            <Form.Item label="Client name">
-              <Select
-                value={activeClient}
-                onChange={(value) => setActiveClient(value)}
-                placeholder="Choose a customer"
-                options={CLIENTS.map((client, index) => ({
-                  label: client.name,
-                  value: index,
-                }))}
-              />
-            </Form.Item>
-            <Form.Item label="Address">
-              <Input
-                disabled
-                placeholder="Customer's address..."
-                value={
-                  activeClient !== undefined
-                    ? CLIENTS[activeClient].address
-                    : undefined
-                }
-              />
-            </Form.Item>
-          </Form>
-        </Col>
-        <Col span={12} className="bg-gray-100 p-8">
-          <Card className="shadow-lg">
-            <Typography.Title level={5}>Invoice</Typography.Title>
-            <Flex justify="space-between">
-              <div className="text-gray-400">ID #2304-ZAK</div>
-              <div>
-                <span className="text-gray-400">Date: </span>
-                <strong>31/03/2004</strong>
-              </div>
-            </Flex>
-            <div>
-              <strong>Nguyen Phuc Thanh</strong>
-            </div>
-            <div>23 An Duong Vuong, p1,q8, HCM</div>
-            <Table columns={columns} pagination={false} dataSource={DATA} />
-            <Divider></Divider>
-            <Flex justify="space-between" className="py-1">
-              <strong>Total:</strong>
-              <strong>$20</strong>
-            </Flex>
-            <Flex justify="space-between" className="py-1">
-              <strong>Discount:</strong>
-              <strong>20%</strong>
-            </Flex>
-            <Divider></Divider>
-            <Flex justify="space-between" className="py-1">
-              <strong>Payment:</strong>
-              <strong>$16</strong>
-            </Flex>
-          </Card>
-        </Col>
-      </Row>
+      <>
+        <Flex justify="space-between">
+          <div>
+            <strong className="text-lg">
+              Customer Name: {info.customerName}
+            </strong>
+            <div>Customer ID: {info.customerId}</div>
+            <div>Order ID: {info.orderId}</div>
+          </div>
+          <div>
+            <span className="text-gray-400 text-xs">Date: </span>
+            <strong>{formattedDate(info.datedOn)}</strong>
+          </div>
+        </Flex>
+        <Table
+          columns={columns}
+          pagination={false}
+          dataSource={info.orderDetails}
+        />
+        <Divider></Divider>
+        <Flex justify="space-between" className="py-1">
+          <strong>Total:</strong>
+          <strong>{info.totalPrice}</strong>
+        </Flex>
+        <Flex justify="space-between" className="py-1">
+          <strong>Payment method:</strong>
+          <Form.Item>
+            <Select
+              value={paymentMethod}
+              onChange={setPaymentMethod}
+              options={[
+                {
+                  label: "Cash",
+                  value: "Cash",
+                },
+                {
+                  label: "Credit",
+                  value: "Credit",
+                },
+              ]}
+            />
+          </Form.Item>
+        </Flex>
+
+        {!invoice && (
+          <Button
+            loading={createInvoiceLoading}
+            type="primary"
+            className="w-full"
+            icon={<FontAwesomeIcon icon={faPlus} />}
+            onClick={handleCreateInvoice}
+          >
+            Create invoice
+          </Button>
+        )}
+
+        <Flex justify="center">
+          {invoice && (
+            <Invoice
+              info={invoice}
+              reservationId={info.reservationId}
+              onHide={onHide}
+            />
+          )}
+        </Flex>
+      </>
     </Modal>
   );
 };

@@ -1,18 +1,26 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL:
-    "https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api",
+  baseURL: "http://localhost:5201/api",
+  withCredentials: false,
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json",
+  },
 });
 
 axiosInstance.interceptors.request.use(
-  (request) => {
-    console.log(request);
-    // Edit request config
-    return request;
+  (config) => {
+    // You can modify the config before the request is sent
+    // For example, attach an authorization token
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   },
   (error) => {
-    console.log(error);
+    // Do something with request error
     return Promise.reject(error);
   }
 );

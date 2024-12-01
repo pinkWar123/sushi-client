@@ -11,9 +11,11 @@ import {
 } from "antd";
 import Input from "antd/es/input/Input";
 import { FunctionComponent } from "react";
+import { IEmployee } from "../../../@types/response/employee";
 
 interface EmployeeEditDrawerProps {
   onHide: () => void;
+  employee: IEmployee;
 }
 
 const branches = [
@@ -70,6 +72,7 @@ const branches = [
 
 const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
   onHide,
+  employee,
 }) => {
   return (
     <Drawer
@@ -98,7 +101,7 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
           src="https://png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg"
         />
         <Form.Item label="Name">
-          <Input value={"Leslie Alexander"} />
+          <Input value={employee.name} />
         </Form.Item>
         <Row gutter={8}>
           <Col span={12}>
@@ -109,15 +112,15 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
           <Col span={12}>
             <Form.Item label="Gender">
               <Select
-                value={"female"}
+                value={employee.gender}
                 options={[
                   {
                     label: "Male",
-                    value: "male",
+                    value: "Nam",
                   },
                   {
                     label: "Female",
-                    value: "female",
+                    value: "Nữ",
                   },
                 ]}
               />
@@ -135,7 +138,7 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
           </Col>
           <Col span={12}>
             <Form.Item label="Employee ID">
-              <Input value={"EMP-20231008-007"} />
+              <Input value={employee.id} />
             </Form.Item>
           </Col>
           <Col span={12}>

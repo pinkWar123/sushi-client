@@ -1,7 +1,7 @@
 export const PATH = {
   HOME: "/",
   DASHBOARD: {
-    path: "dashboard",
+    path: "/:branchId/dashboard",
     outlet: {
       index: "",
       menu: "menu",
@@ -10,10 +10,22 @@ export const PATH = {
       customer: "customers",
     },
   },
-  AUTH: {
-    path: "auth",
+  LOGIN: {
+    path: "login",
     outlet: {
-      login: "login",
+      index: "",
+    },
+  },
+  REGISTER: {
+    path: "register",
+    outlet: {
+      index: "",
+    },
+  },
+  WELCOME: {
+    path: "welcome",
+    outlet: {
+      index: "",
     },
   },
 };
