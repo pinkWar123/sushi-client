@@ -14,3 +14,8 @@ export interface BranchDetailDto {
   motorParking: boolean;
   ship: boolean;
 }
+
+export interface IDailyRevenue {
+  revenueDate: string;
+  totalRevenue: number;
+}
