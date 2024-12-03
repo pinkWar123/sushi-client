@@ -1,30 +1,19 @@
 import { Avatar, Card, Col, Divider, Flex, Row, Typography } from "antd";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import Status from "./Status";
-import OrderDetail from "./OrderDetail";
-import PaymentModal from "./PaymentModal";
 import { IReservation } from "../../../@types/response/reservation";
 import { formattedDate, formattedTime } from "../../../utils/time";
+import { OrderStatus } from "../../../constants/order";
+import PlacedFooter from "./PlacedFooter";
+import InProgressFooter from "./InProgressFooter";
 
 interface OrderItemProps {
   info: IReservation;
 }
 
 const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
-  const [showDetail, setShowDetail] = useState<boolean>(false);
-  const [showBills, setShowBills] = useState<boolean>(false);
   return (
     <>
-      {showDetail && (
-        <OrderDetail
-          reservationId={info.reservationId}
-          details={info.orderDetails}
-          onHide={() => setShowDetail(false)}
-        />
-      )}
-      {showBills && (
-        <PaymentModal info={info} onHide={() => setShowBills(false)} />
-      )}
       <Card>
         <Flex gap={"middle"}>
           <Avatar shape="square" className="bg-green-600">
@@ -33,9 +22,6 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
           <Flex justify="space-between" className="flex-1">
             <div>
               <div className="font-bold">{info.customerName}</div>
-              {/* <div className="text-xs text-gray-400 flex justify-between">
-                Reservation : {info.reservationId}
-              </div> */}
               <Typography.Paragraph
                 ellipsis={{
                   rows: 1,
@@ -113,22 +99,12 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
         </Flex>
 
         <Row gutter={16} className="mt-4" justify="center">
-          <Col span={12}>
-            <button
-              onClick={() => setShowDetail(true)}
-              className="rounded-md py-1 text-sm text-green-700 w-full bg-gray-100 font-bold"
-            >
-              See Details
-            </button>
-          </Col>
-          <Col span={12}>
-            <button
-              onClick={() => setShowBills(true)}
-              className="rounded-md py-1 w-full bg-yellow-400 font-bold"
-            >
-              Pay Bills
-            </button>
-          </Col>
+          {info.status === OrderStatus.Placed && (
+            <PlacedFooter reservationId={info.reservationId} />
+          )}
+          {info.status === OrderStatus.InProgress && (
+            <InProgressFooter info={info} />
+          )}
         </Row>
       </Card>
     </>

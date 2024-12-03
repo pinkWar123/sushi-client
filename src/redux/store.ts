@@ -5,6 +5,7 @@ import { default as customersReducer } from "./customerSlice";
 import { default as reservationsReducer } from "./reservationSlice";
 import { default as branchesReducer } from "./branchSlice";
 import { default as clientSectionsReducer } from "./client/clientSectionSlice";
+import { default as accountReducer } from "./accountSlice";
 import { MessageInstance } from "antd/es/message/interface";
 import { NotificationInstance } from "antd/es/notification/interface";
 import { ModalStaticFunctions } from "antd/es/modal/confirm";
@@ -31,6 +32,7 @@ export const store = configureStore({
     reservations: reservationsReducer,
     branches: branchesReducer,
     clientSections: clientSectionsReducer,
+    account: accountReducer,
   },
 });
 

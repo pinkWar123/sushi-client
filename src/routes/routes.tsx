@@ -44,22 +44,18 @@ export const PUBLIC_ROUTES = [
     components: [
       {
         path: PATH.LOGIN.outlet.index,
-        component: lazy(
-          () => import("../pages/Login/Login")
-        ),
+        component: lazy(() => import("../pages/Login/Login")),
       },
-    ]
+    ],
   },
   {
     path: PATH.REGISTER.path,
     components: [
       {
         path: PATH.REGISTER.outlet.index,
-        component: lazy(
-          () => import ('../pages/Register/Register')
-        )
-      }
-    ]
+        component: lazy(() => import("../pages/Register/Register")),
+      },
+    ],
   },
   {
     path: PATH.WELCOME.path,
@@ -67,11 +63,20 @@ export const PUBLIC_ROUTES = [
       {
         path: PATH.WELCOME.outlet.index,
         component: lazy(
-          () => import ('../pages/ClientPages/ClientDashboard/Dashboard')
-        )
-      }
-    ]
-  }
+          () => import("../pages/ClientPages/ClientDashboard/Dashboard")
+        ),
+      },
+    ],
+  },
+  {
+    path: PATH.BOOKING.path,
+    components: [
+      {
+        path: PATH.BOOKING.outlet.index,
+        component: lazy(() => import("../pages/ClientPages/BookingPage")),
+      },
+    ],
+  },
 ];
 
 export const PRIVATE_ROUTES = [];

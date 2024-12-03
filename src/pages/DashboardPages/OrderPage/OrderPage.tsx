@@ -15,6 +15,7 @@ import OrderItem from "./OrderItem";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import {
   changeStatus,
+  fetchEmptyTables,
   fetchReservations,
   selectReservationData,
 } from "../../../redux/reservationSlice";
@@ -73,13 +74,17 @@ const OrderPage: FunctionComponent<OrderPageProps> = () => {
   };
 
   useEffect(() => {
-    console.log(getDate().toISOString());
     const query: IDetailedReservationCardsQuery = {
       branchId: branchId ?? "",
       datedOn: getDate().toISOString(),
     };
     dispatch(fetchReservations(query));
   }, [dispatch, getDate, branchId]);
+
+  useEffect(() => {
+    dispatch(fetchEmptyTables(branchId ?? ""));
+  }, [branchId]);
+
   if (loading) return <Skeleton active />;
 
   return (

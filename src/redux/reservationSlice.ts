@@ -4,16 +4,23 @@ import { RootState } from "./store";
 import {
   ICreateInvoiceQuery,
   IDetailedReservationCardsQuery,
+  IUpdateReservationStatusRequest,
 } from "../@types/request/request";
-import { callGetDetailedReservationCards } from "../services/reservation";
+import {
+  callGetDetailedReservationCards,
+  callUpdateReservationStatus,
+} from "../services/reservation";
 import { callCreateNewInvoice, callPurchaseInvoice } from "../services/invoice";
 import { OrderStatus } from "../constants/order";
+import { IEmptyTableListResponse } from "../@types/response/table";
+import { callGetEmptyTables } from "../services/table";
 
 export interface ReservationState {
   loading: boolean;
   createInvoiceLoading: boolean;
   status: OrderStatus;
   data: IReservation[];
+  emptyTables: IEmptyTableListResponse;
 }
 
 const initialState: ReservationState = {
@@ -21,6 +28,7 @@ const initialState: ReservationState = {
   createInvoiceLoading: false,
   data: [],
   status: OrderStatus.Placed,
+  emptyTables: [],
 };
 
 export const fetchReservations = createAsyncThunk(
@@ -29,6 +37,14 @@ export const fetchReservations = createAsyncThunk(
     const res = await callGetDetailedReservationCards(query);
     console.log(res);
     return res.data;
+  }
+);
+
+export const updateReservationStatus = createAsyncThunk(
+  "updateReservationStatus",
+  async (request: IUpdateReservationStatusRequest) => {
+    await callUpdateReservationStatus(request);
+    return request;
   }
 );
 
@@ -50,7 +66,15 @@ export const purchaseInvoice = createAsyncThunk(
   async (data: IPurchaseInvoice) => {
     const { invoiceId, reservationId } = data;
     await callPurchaseInvoice(invoiceId);
-    return reservationId;
+    return { invoiceId, reservationId };
+  }
+);
+
+export const fetchEmptyTables = createAsyncThunk(
+  "empty-tables",
+  async (branchId: string) => {
+    const res = await callGetEmptyTables(branchId);
+    return res;
   }
 );
 
@@ -61,6 +85,16 @@ const reservationSlice = createSlice({
     changeStatus(state: ReservationState, action: PayloadAction<OrderStatus>) {
       const status = action.payload;
       state.status = status;
+    },
+    finishReservation(state: ReservationState, action: PayloadAction<string>) {
+      const reservationId = action.payload;
+      state.data = state.data.map((data) => {
+        if (data.reservationId !== reservationId) return data;
+        return {
+          ...data,
+          status: OrderStatus.Done,
+        };
+      });
     },
   },
   extraReducers: (builder) => {
@@ -78,30 +112,46 @@ const reservationSlice = createSlice({
       .addCase(createInvoice.pending, (state) => {
         state.createInvoiceLoading = true;
       })
-      .addCase(createInvoice.fulfilled, (state, action) => {
+      .addCase(updateReservationStatus.fulfilled, (state, action) => {
+        const { tableId, reservationId } = action.payload;
+        const tableNumber =
+          state.emptyTables.find((e) => e.id === tableId)?.tableNumber ?? 0;
+        state.data = state.data.map((reservation) =>
+          reservation.reservationId === reservationId
+            ? { ...reservation, status: reservation.status + 1, tableNumber }
+            : reservation
+        );
+        state.emptyTables = state.emptyTables.filter(
+          (table) => table.id !== tableId
+        );
+      })
+      .addCase(createInvoice.fulfilled, (state) => {
         state.createInvoiceLoading = false;
-        const orderToUpdate = action.payload;
-        state.data = state.data.map((data) => {
-          if (data.orderId !== orderToUpdate.orderId) return data;
-          return {
-            ...data,
-            status: OrderStatus.Done,
-          };
-        });
+        // const orderToUpdate = action.payload;
+        // state.data = state.data.map((data) => {
+        //   if (data.orderId !== orderToUpdate.orderId) return data;
+        //   return {
+        //     ...data,
+        //     status: OrderStatus.Done,
+        //   };
+        // });
       })
       .addCase(createInvoice.rejected, (state) => {
         state.createInvoiceLoading = false;
       })
       .addCase(purchaseInvoice.fulfilled, (state, action) => {
-        const reservationId = action.payload;
-        state.data = state.data.map((reservation) =>
-          reservation.reservationId === reservationId
-            ? {
-                ...reservation,
-                status: OrderStatus.Done,
-              }
-            : reservation
-        );
+        // const { reservationId } = action.payload;
+        // state.data = state.data.map((reservation) =>
+        //   reservation.reservationId === reservationId
+        //     ? {
+        //         ...reservation,
+        //         status: OrderStatus.Done,
+        //       }
+        //     : reservation
+        // );
+      })
+      .addCase(fetchEmptyTables.fulfilled, (state, action) => {
+        state.emptyTables = action.payload;
       });
   },
 });
@@ -113,5 +163,5 @@ export const selectReservationData = (state: RootState) => ({
   status: state.reservations.status,
 });
 
-export const { changeStatus } = reservationSlice.actions;
+export const { changeStatus, finishReservation } = reservationSlice.actions;
 export default reservationSlice.reducer;

@@ -1,5 +1,10 @@
 import axios from "axios";
-import { IDetailedReservationCardsQuery } from "../@types/request/request";
+import {
+  ICreateReservationRequest,
+  ICreateSurveyRequest,
+  IDetailedReservationCardsQuery,
+  IUpdateReservationStatusRequest,
+} from "../@types/request/request";
 import { IResponse } from "../@types/response/response";
 import axiosInstance from "./axios.config";
 import { IReservation } from "../@types/response/reservation";
@@ -19,4 +24,22 @@ export const callGetDetailedReservationCards = async (
       }
     )
   ).data;
+};
+
+export const callCreateReservation = async (
+  request: ICreateReservationRequest
+) => {
+  return (await axiosInstance.post("reservation/submit", request)).data;
+};
+
+export const callUpdateReservationStatus = async (
+  request: IUpdateReservationStatusRequest
+) => {
+  return (
+    await axiosInstance.post("reservation/updateReservationStatus", request)
+  ).data;
+};
+
+export const callCreateSurvey = async (request: ICreateSurveyRequest) => {
+  return (await axiosInstance.post("Survey/create", request)).data;
 };

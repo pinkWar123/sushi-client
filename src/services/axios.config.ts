@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5201/api",
+  baseURL:
+    "https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api",
   withCredentials: false,
   headers: {
     "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log(config);
     return config;
   },
   (error) => {

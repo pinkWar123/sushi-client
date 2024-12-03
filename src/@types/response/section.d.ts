@@ -4,7 +4,7 @@ export interface Section {
 }
 
 export interface Dish {
-  dishId: number;
+  dishId: string;
   dishName: string;
   currentPrice: number;
 }

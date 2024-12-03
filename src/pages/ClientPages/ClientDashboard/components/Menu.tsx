@@ -3,10 +3,13 @@ import "./css/Menu.css";
 import DishItem from "./DishItem";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import {
+  changeBranch,
   changeSelectedSection,
+  fetchBranches,
   fetchDishes,
   fetchSections,
 } from "../../../../redux/client/clientSectionSlice";
+import { Select } from "antd";
 
 // async function getSectionData() {
 //   try {
@@ -55,6 +58,10 @@ function Menu() {
     (state) => state.clientSections.selectedSection
   );
   const dishes = useAppSelector((state) => state.clientSections.dishes);
+  const branches = useAppSelector((state) => state.clientSections.branches);
+  const branchId = useAppSelector(
+    (state) => state.clientSections.selectedBranchId
+  );
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -62,16 +69,22 @@ function Menu() {
   }, [dispatch]);
 
   useEffect(() => {
+    if (!branchId) return;
     dispatch(
       fetchDishes({
         sectionId: selectedSection?.sectionId,
+        branchId,
         minPrice,
         maxPrice,
         pageNumber: 1,
         pageSize: 100,
       })
     );
-  }, [selectedSection, minPrice, maxPrice]);
+  }, [selectedSection, minPrice, maxPrice, branchId]);
+
+  useEffect(() => {
+    dispatch(fetchBranches());
+  }, [dispatch]);
 
   if (!menuSections) {
     return <div>Loading sections...</div>;
@@ -94,6 +107,15 @@ function Menu() {
             {section.sectionName}
           </div>
         ))}
+        <Select
+          placeholder="Choose a branch"
+          className="w-full mt-4"
+          options={branches.map((branch) => ({
+            label: branch.name,
+            value: branch.branchId,
+          }))}
+          onChange={(value) => dispatch(changeBranch(value))}
+        />
       </div>
 
       {/* Section Details */}

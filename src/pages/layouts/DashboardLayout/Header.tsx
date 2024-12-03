@@ -8,12 +8,14 @@ import { callGetAllBranchNames } from "../../../services/branch";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import NotFound from "../../ErrorPages/NotFound";
 import { PATH } from "../../../constants/paths";
+import { useAppSelector } from "../../../hooks/redux";
 
 interface HeaderProps {}
 
 const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
   const [branchNames, setBranchNames] = useState<BranchNameDto[]>([]);
   const { branchId } = useParams();
+  const { name } = useAppSelector((state) => state.account);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchBranches = async () => {
@@ -63,7 +65,7 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
         <Space>
           <FontAwesomeIcon icon={faBell} />
           <Avatar />
-          <strong>Soif Uddin</strong>
+          <strong>{name}</strong>
         </Space>
       </Flex>
     </Header>

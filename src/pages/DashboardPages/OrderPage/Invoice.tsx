@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from "react";
 import { ICreateInvoiceResponse } from "../../../@types/response/invoice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar } from "@fortawesome/free-regular-svg-icons";
+import { faCalendar, faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { Button, Card, Divider, Flex, message, Space, Typography } from "antd";
 import { formattedDate } from "../../../utils/time";
 import {
@@ -10,7 +10,13 @@ import {
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch } from "../../../hooks/redux";
-import { purchaseInvoice } from "../../../redux/reservationSlice";
+import {
+  finishReservation,
+  purchaseInvoice,
+} from "../../../redux/reservationSlice";
+import { ISurvey } from "../../../@types/request/request";
+import Survey from "./Survey";
+import { callCreateSurvey } from "../../../services/reservation";
 
 interface InvoiceProps {
   info: ICreateInvoiceResponse;
@@ -44,23 +50,46 @@ const Invoice: FunctionComponent<InvoiceProps> = ({
   onHide,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const dispath = useAppDispatch();
+  const [showSurvey, setShowSurvey] = useState<boolean>(false);
+  const [survey, setSurvey] = useState<ISurvey>({ point: 0, comment: "" });
+  const [invoiceId, setInvoiceId] = useState<string>();
+  const dispatch = useAppDispatch();
   const handlePurchase = async () => {
     try {
       setLoading(true);
-      await dispath(
+      const { invoiceId } = await dispatch(
         purchaseInvoice({
           reservationId,
           invoiceId: info.id,
         })
-      );
+      ).unwrap();
+      setInvoiceId(invoiceId);
+      setShowSurvey(true);
       message.success("Purchase Invoice successfully");
-      onHide();
+      setLoading(false);
     } catch (error) {
       message.error("Purchase failed");
       setLoading(false);
     } finally {
       setLoading(true);
+    }
+  };
+
+  const handleSendSurvey = async () => {
+    if (!invoiceId) {
+      message.error(
+        "Cannot submit a survey for an invoice that does not exist"
+      );
+      return;
+    }
+    try {
+      const res = await callCreateSurvey({ ...survey, invoiceId });
+      console.log(res);
+      message.success("Thanks for your survey!");
+      dispatch(finishReservation(reservationId));
+      onHide();
+    } catch (error) {
+      message.error("An error occurred when creating the survey");
     }
   };
 
@@ -96,13 +125,25 @@ const Invoice: FunctionComponent<InvoiceProps> = ({
         <strong>After discount:</strong>
         <strong>{info.afterDiscount}</strong>
       </Flex>
-      <Button
-        loading={loading}
-        onClick={handlePurchase}
-        className="flex justify-center gap-2 w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-center rounded-md"
-      >
-        Purchase
-      </Button>
+      {!showSurvey && (
+        <Button
+          loading={loading}
+          onClick={handlePurchase}
+          type="primary"
+          className="flex justify-center gap-2 w-full py-2  font-bold text-center rounded-md"
+        >
+          Purchase
+        </Button>
+      )}
+      {showSurvey && <Survey survey={survey} setSurvey={setSurvey} />}
+      {showSurvey && (
+        <button
+          onClick={handleSendSurvey}
+          className="flex justify-center gap-2 w-full py-2  font-bold text-center rounded-md bg-orange-300 hover:bg-orange-400"
+        >
+          <FontAwesomeIcon icon={faPaperPlane} /> Submit survey
+        </button>
+      )}
     </Card>
   );
 };

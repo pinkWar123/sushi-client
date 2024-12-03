@@ -5,10 +5,11 @@ interface InputBoxProps {
   label: string;
   type: string;
   size?: number;
-  name: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  value: string;
+  name?: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string;
   error?: string; // New error prop
+  disabled?: boolean;
 }
 
 function InputBox({
@@ -19,6 +20,7 @@ function InputBox({
   name,
   onChange,
   value,
+  disabled = false,
   error, // Error message
 }: InputBoxProps) {
   return (
@@ -32,6 +34,7 @@ function InputBox({
         name={name}
         onChange={onChange}
         value={value}
+        disabled={disabled}
       />
       <label htmlFor={id} className="input-label">
         {label}
