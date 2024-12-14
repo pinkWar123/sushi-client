@@ -53,6 +53,7 @@ function Login() {
 
       if (login.fulfilled.match(res)) {
         const { userName } = res.payload; // TypeScript now knows this is ILoginResponse
+        console.log("userName", userName);
         message.success("Login successfully");
         await dispatch(getUserCredentials());
         navigate("/" + PATH.WELCOME.path, {

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL:
-    "https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api",
+  baseURL: "http://localhost:5201/api",
   withCredentials: false,
   headers: {
     "Access-Control-Allow-Origin": "*",
