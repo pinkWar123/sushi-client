@@ -12,8 +12,6 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
 }) => {
   const emptyTables = useAppSelector((state) => state.reservations.emptyTables);
   const employeeId = useAppSelector((state) => state.account.employeeId);
-  console.log("employeeId", employeeId);
-
   const [selectedTableId, setSelectedTableId] = useState<string>();
   const dispatch = useAppDispatch();
   const handleConfirm = async () => {
@@ -23,13 +21,13 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
     }
     try {
       console.log({
-        tabledId: selectedTableId,
+        TabledId: selectedTableId,
         reservationId,
         employeeId,
       });
       await dispatch(
         updateReservationStatus({
-          tableId: selectedTableId,
+          TableId: selectedTableId,
           reservationId,
           employeeId,
         })
@@ -49,7 +47,7 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
           placeholder="Choose table..."
           options={emptyTables.map((emptyTable) => ({
             label: `Table ${emptyTable.tableNumber}`,
-            value: emptyTable.TableId,
+            value: emptyTable.tableId,
           }))}
         />
       </Col>
