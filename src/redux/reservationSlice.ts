@@ -139,7 +139,7 @@ const reservationSlice = createSlice({
       .addCase(createInvoice.rejected, (state) => {
         state.createInvoiceLoading = false;
       })
-      .addCase(purchaseInvoice.fulfilled, (state, action) => {
+      .addCase(purchaseInvoice.fulfilled, () => {
         // const { reservationId } = action.payload;
         // state.data = state.data.map((reservation) =>
         //   reservation.reservationId === reservationId
