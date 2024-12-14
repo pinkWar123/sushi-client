@@ -16,23 +16,23 @@ const initialState: IBranchState = {
         label: "Earning",
         data: [] as number[], // Ensure data is of type number[]
         fill: true,
-        backgroundColor: (context: ScriptableContext<"line">) => {
-          const chart = context.chart;
-          const { ctx, chartArea } = chart;
+        // backgroundColor: (context: ScriptableContext<"line">) => {
+        //   const chart = context.chart;
+        //   const { ctx, chartArea } = chart;
 
-          if (!chartArea) {
-            return "rgba(91, 84, 220, 0)";
-          }
-          const gradient = ctx.createLinearGradient(
-            0,
-            chartArea.top,
-            0,
-            chartArea.bottom
-          );
-          gradient.addColorStop(0, "rgba(91, 84, 220, 0.3)");
-          gradient.addColorStop(1, "rgba(91, 84, 220, 0)");
-          return gradient;
-        },
+        //   if (!chartArea) {
+        //     return "rgba(91, 84, 220, 0)";
+        //   }
+        //   const gradient = ctx.createLinearGradient(
+        //     0,
+        //     chartArea.top,
+        //     0,
+        //     chartArea.bottom
+        //   );
+        //   gradient.addColorStop(0, "rgba(91, 84, 220, 0.3)");
+        //   gradient.addColorStop(1, "rgba(91, 84, 220, 0)");
+        //   return gradient;
+        // },
         borderColor: "#5B54DC",
         tension: 0.4,
         pointBackgroundColor: "#5B54DC",
@@ -54,9 +54,9 @@ const initialState: IBranchState = {
         bodyColor: "#fff",
         padding: 10,
         displayColors: false,
-        callbacks: {
-          label: (tooltipItem) => `${tooltipItem.raw}K Earning`,
-        },
+        // callbacks: {
+        //   label: (tooltipItem) => `${tooltipItem.raw}K Earning`,
+        // },
       },
     },
     scales: {
@@ -65,7 +65,7 @@ const initialState: IBranchState = {
         ticks: {
           stepSize: 2,
           color: "#A8A8A8",
-          callback: (value: number | string) => `${value}k`, // Only number here
+          // callback: (value: number | string) => `${value}k`, // Only number here
         },
         grid: {
           color: "rgba(168, 168, 168, 0.3)",

@@ -28,4 +28,10 @@ export const PATH = {
       index: "",
     },
   },
+  BOOKING: {
+    path: "booking",
+    outlet: {
+      index: "",
+    },
+  },
 };

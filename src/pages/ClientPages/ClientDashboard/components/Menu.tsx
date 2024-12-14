@@ -1,77 +1,90 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./css/Menu.css";
-import axios from "axios";
+import DishItem from "./DishItem";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
+import {
+  changeBranch,
+  changeSelectedSection,
+  fetchBranches,
+  fetchDishes,
+  fetchSections,
+} from "../../../../redux/client/clientSectionSlice";
+import { Select } from "antd";
 
-type Section = {
-  sectionId: string;
-  sectionName: string;
-};
-type Dish = {
-  dishId: number;
-  dishName: string;
-  currentPrice: number;
-};
+// async function getSectionData() {
+//   try {
+//     const response = await axios.get(
+//       "https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api/section"
+//     );
+//     console.log(response.data);
+//     return response.data.data;
+//   } catch (err) {
+//     console.error(err);
+//     return null;
+//   }
+// }
 
-async function getSectionData() {
-  try {
-    const response = await axios.get(
-      "https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api/section"
-    );
-    return response.data.data;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
-
-async function getDish(
-  id?: string,
-  minPrice?: number | null,
-  maxPrice?: number | null
-) {
-  try {
-    console.log(minPrice, maxPrice);
-    let url = `https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api/dish/?SectionId=${id}`;
-    if (minPrice !== null) {
-      url += `&MinPrice=${minPrice}`;
-    }
-    if (maxPrice !== null) {
-      url += `&MaxPrice=${maxPrice}`;
-    }
-    const response = await axios.get(url);
-    return response.data.data;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
+// async function getDish(
+//   id?: string,
+//   minPrice?: number | null,
+//   maxPrice?: number | null
+// ) {
+//   try {
+//     console.log(minPrice, maxPrice);
+//     let url = `https://sushiserver-bbabf5dvhsdperbb.southeastasia-01.azurewebsites.net/api/dish/?SectionId=${id}`;
+//     if (minPrice !== null) {
+//       url += `&MinPrice=${minPrice}`;
+//     }
+//     if (maxPrice !== null) {
+//       url += `&MaxPrice=${maxPrice}`;
+//     }
+//     const response = await axios.get(url);
+//     return response.data.data;
+//   } catch (err) {
+//     console.error(err);
+//     return null;
+//   }
+// }
 
 function Menu() {
-  const [menuSections, setMenuSections] = useState<Section[] | null>(null);
-  const [selectedSection, setSelectedSection] = useState<Section | null>(null);
-  const [dishes, setDishes] = useState<Dish[] | null>(null);
-  const [maxPrice, setMaxPrice] = useState<number | null>(null);
-  const [minPrice, setMinPrice] = useState<number | null>(null);
+  // const [menuSections, setMenuSections] = useState<Section[] | null>(null);
+  // const [dishes, setDishes] = useState<Dish[] | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number>();
+  const [minPrice, setMinPrice] = useState<number>();
+  const menuSections = useAppSelector(
+    (state) => state.clientSections.menuSections
+  );
+  const selectedSection = useAppSelector(
+    (state) => state.clientSections.selectedSection
+  );
+  const dishes = useAppSelector((state) => state.clientSections.dishes);
+  const branches = useAppSelector((state) => state.clientSections.branches);
+  const branchId = useAppSelector(
+    (state) => state.clientSections.selectedBranchId
+  );
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    getSectionData()
-      .then((data) => {
-        if (data) setMenuSections(data);
-      })
-      .catch((error) => console.error("Error fetching section data:", error));
-  }, []);
+    dispatch(fetchSections());
+  }, [dispatch]);
 
   useEffect(() => {
-    getDish(selectedSection?.sectionId, minPrice, maxPrice)
-      .then((data) => {
-        if (data) setDishes(data);
+    if (!branchId) return;
+    dispatch(
+      fetchDishes({
+        sectionId: selectedSection?.sectionId,
+        branchId,
+        minPrice,
+        maxPrice,
+        pageNumber: 1,
+        pageSize: 100,
       })
-      .catch((error) => console.error("Error fetching dish data: ", error));
-  }, [selectedSection, minPrice, maxPrice]);
+    );
+  }, [selectedSection, minPrice, maxPrice, branchId]);
 
-  const handleSectionClick = (section: Section) => {
-    setSelectedSection(section);
-  };
+  useEffect(() => {
+    dispatch(fetchBranches());
+  }, [dispatch]);
 
   if (!menuSections) {
     return <div>Loading sections...</div>;
@@ -89,11 +102,20 @@ function Menu() {
             id="cat-item"
             key={section.sectionId}
             className="category-item"
-            onClick={() => handleSectionClick(section)}
+            onClick={() => dispatch(changeSelectedSection(section))}
           >
             {section.sectionName}
           </div>
         ))}
+        <Select
+          placeholder="Choose a branch"
+          className="w-full mt-4"
+          options={branches.map((branch) => ({
+            label: branch.name,
+            value: branch.branchId,
+          }))}
+          onChange={(value) => dispatch(changeBranch(value))}
+        />
       </div>
 
       {/* Section Details */}
@@ -110,7 +132,7 @@ function Menu() {
               min="0"
               max="100"
               onChange={(event) =>
-                setMaxPrice(parseInt(event.target.value) || null)
+                setMaxPrice(parseInt(event.target.value) || undefined)
               }
             />
           </div>
@@ -124,20 +146,15 @@ function Menu() {
               min="0"
               max="100"
               onChange={(event) =>
-                setMinPrice(parseInt(event.target.value) || null)
+                setMinPrice(parseInt(event.target.value) || undefined)
               }
             />
           </div>
         </div>
         <div id="dish-list">
-          {dishes?.map((dish) => {
-            return (
-              <div id="dish-item" key={dish.dishId}>
-                <h2 id="dish-item-title">{dish.dishName}</h2>
-                <p>{dish.currentPrice}</p>
-              </div>
-            );
-          })}
+          {dishes?.map((dish) => (
+            <DishItem dish={dish} />
+          ))}
           {dishes?.length === 0 && "No data to display"}
         </div>
       </div>
