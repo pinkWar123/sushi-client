@@ -86,7 +86,7 @@ const BookingPage: FunctionComponent<BookingPageProps> = () => {
           />
           <InputBox
             onChange={handleChange}
-            type="date"
+            type="datetime-local"
             label="Ngày đặt"
             id="date"
             name="datedOn"

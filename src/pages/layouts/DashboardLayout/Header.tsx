@@ -51,7 +51,7 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
         <Space>
           <strong className=" ">Foody.io</strong>
           <div className="flex items-center">
-            <Select
+            {/* <Select
               options={branchNames.map((branch) => ({
                 label: <div>{branch.name}</div>,
                 value: branch.branchId,
@@ -59,7 +59,7 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
               value={branchId}
               onChange={(value) => handleNavigate(value)}
               placeholder="Choose a branch..."
-            />
+            /> */}
           </div>
         </Space>
         <Space>
