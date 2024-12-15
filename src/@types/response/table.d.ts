@@ -1,5 +1,5 @@
 export interface IEmptyTable {
-  TableId: string;
+  tableId: string;
   tableNumber: number;
 }
 
