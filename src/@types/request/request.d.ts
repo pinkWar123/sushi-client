@@ -56,7 +56,7 @@ export interface ICreateReservationRequest {
 export interface IUpdateReservationStatusRequest {
   reservationId: string;
   employeeId: string;
-  tableId: string;
+  TableId: string;
 }
 
 export interface ISurvey {

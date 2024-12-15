@@ -21,13 +21,13 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
     }
     try {
       console.log({
-        tabledId: selectedTableId,
+        TabledId: selectedTableId,
         reservationId,
         employeeId,
       });
       await dispatch(
         updateReservationStatus({
-          tableId: selectedTableId,
+          TableId: selectedTableId,
           reservationId,
           employeeId,
         })
@@ -47,7 +47,7 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
           placeholder="Choose table..."
           options={emptyTables.map((emptyTable) => ({
             label: `Table ${emptyTable.tableNumber}`,
-            value: emptyTable.id,
+            value: emptyTable.tableId,
           }))}
         />
       </Col>
