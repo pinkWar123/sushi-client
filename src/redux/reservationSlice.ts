@@ -113,9 +113,9 @@ const reservationSlice = createSlice({
         state.createInvoiceLoading = true;
       })
       .addCase(updateReservationStatus.fulfilled, (state, action) => {
-        const { tableId, reservationId } = action.payload;
+        const { TableId, reservationId } = action.payload;
         const tableNumber =
-          state.emptyTables.find((e) => e.TableId === tableId)?.tableNumber ??
+          state.emptyTables.find((e) => e.TableId === TableId)?.tableNumber ??
           0;
         state.data = state.data.map((reservation) =>
           reservation.reservationId === reservationId
@@ -123,7 +123,7 @@ const reservationSlice = createSlice({
             : reservation
         );
         state.emptyTables = state.emptyTables.filter(
-          (table) => table.TableId !== tableId
+          (table) => table.TableId !== TableId
         );
       })
       .addCase(createInvoice.fulfilled, (state) => {
