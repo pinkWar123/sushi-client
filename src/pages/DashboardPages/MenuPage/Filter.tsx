@@ -16,16 +16,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 interface FilterProps {}
 
 const marks: SliderSingleProps["marks"] = {
-  0: "0$",
+  0: "0VND",
   100: {
     style: {
       color: "#f50",
     },
-    label: <strong>100$</strong>,
+    label: <strong>1,000,000VND</strong>,
   },
 };
 
-const NATIONS = ["Chinese", "Mexican", "Italian", "Indian", "Western"];
 interface Range {
   minPrice: number;
   maxPrice: number;
@@ -56,6 +55,10 @@ const Filter: FunctionComponent<FilterProps> = () => {
     const searchParams = new URLSearchParams(location.search);
 
     if (filter) searchParams.set("section", filter);
+    if (priceRange) {
+      searchParams.set("minPrice", priceRange.minPrice.toString());
+      searchParams.set("maxPrice", priceRange.maxPrice.toString());
+    }
     dispatch(resetPagination());
     navigate({
       pathname: location.pathname,
@@ -63,7 +66,7 @@ const Filter: FunctionComponent<FilterProps> = () => {
     });
   };
   return (
-    <div className=" sticky top-4  bg-white p-4">
+    <div className=" sticky top-4 bg-white p-4 ">
       <Skeleton loading={loading}>
         <Flex justify="space-between">
           <div className="text-red-500">FILTER</div>
@@ -85,22 +88,25 @@ const Filter: FunctionComponent<FilterProps> = () => {
         </Radio.Group>
 
         <Divider />
-        <Checkbox.Group>
-          {NATIONS.map((nation, index) => (
-            <Checkbox className="w-full" value={nation} key={`nation-${index}`}>
-              <div className="text-xs">{nation}</div>
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
 
         <Divider />
 
         <Typography.Title level={5}>Price range</Typography.Title>
         <Slider
+          className="px-4"
           included={true}
           range={true}
-          marks={marks}
-          defaultValue={[26, 37]}
+          // marks={marks}
+          defaultValue={[
+            priceRange?.minPrice ? priceRange.minPrice / 1000 : 0,
+            priceRange?.maxPrice ? priceRange.maxPrice / 1000 : 100,
+          ]}
+          onChange={(values) => {
+            setPriceRange({
+              minPrice: values[0] * 10 ** 3,
+              maxPrice: values[1] * 10 ** 3,
+            });
+          }}
         />
 
         <Flex justify="center">
