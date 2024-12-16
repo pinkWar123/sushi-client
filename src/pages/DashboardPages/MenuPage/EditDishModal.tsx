@@ -21,7 +21,7 @@ const EditDishModal: FunctionComponent<EditDishModalProps> = ({
   sectionId,
 }) => {
   const [form] = Form.useForm<DishProps>();
-  const sections = useAppSelector((state) => state.menu.sections);
+  const sections = useAppSelector((state) => state.sections.data);
   return (
     <Modal onCancel={onHide} onClose={onHide} open title="Update dish">
       <Form

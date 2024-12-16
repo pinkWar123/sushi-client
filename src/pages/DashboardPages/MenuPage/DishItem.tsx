@@ -10,7 +10,6 @@ interface DishItemProps {
 
 const DishItem: FunctionComponent<DishItemProps> = ({ item, sectionId }) => {
   const [editModel, toggleEditMode] = useState<boolean>(false);
-  const { modal } = App.useApp();
   return (
     <>
       {editModel && (
@@ -25,13 +24,13 @@ const DishItem: FunctionComponent<DishItemProps> = ({ item, sectionId }) => {
           onHide={() => toggleEditMode(false)}
         />
       )}
-      <Card className="mb-4 h-70">
+      <Card className="mb-4 h-64">
         <Flex justify="flex-end">
           <Typography.Paragraph
             ellipsis={{ rows: 1 }}
             className="rounded-full text-white bg-green-700 ring-2 px-2"
           >
-            ${item.currentPrice}
+            {item.currentPrice.toLocaleString()} VND
           </Typography.Paragraph>
         </Flex>
         <Flex className="mt-4" justify="center">
@@ -45,19 +44,7 @@ const DishItem: FunctionComponent<DishItemProps> = ({ item, sectionId }) => {
             <strong className="text-center">{item.dishName}</strong>
           </Typography.Paragraph>
         </Flex>
-        <Flex justify="center">
-          <Rate className="text-sm" value={4} />
-        </Flex>
-        <Typography.Paragraph
-          ellipsis={{ rows: 3 }}
-          className="text-center text-gray-500 text-xs h-8 mt-2"
-        >
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum ipsa
-          provident, quas cum exercitationem repudiandae consectetur quam quae
-          vero. A nesciunt rem asperiores fuga voluptates, dolorem labore facere
-          laborum esse.
-        </Typography.Paragraph>
-        <Flex gap={"middle"} justify="center">
+        {/* <Flex gap={"middle"} justify="center">
           <button
             onClick={() => toggleEditMode(true)}
             className="mt-4 text-red-500 ring-2 ring-red-500 rounded-full py-1 px-4  hover:text-white hover:bg-red-400"
@@ -75,7 +62,7 @@ const DishItem: FunctionComponent<DishItemProps> = ({ item, sectionId }) => {
           >
             Delete
           </button>
-        </Flex>
+        </Flex> */}
       </Card>
     </>
   );

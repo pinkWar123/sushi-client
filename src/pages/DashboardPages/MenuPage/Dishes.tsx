@@ -1,7 +1,6 @@
 import { Col, Flex, Form, Input, Row, Skeleton, Typography } from "antd";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import DishItem from "./DishItem";
-import Search from "antd/es/transfer/search";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import AddDishModal from "./AddDishModal";
@@ -11,7 +10,7 @@ import {
   fetchDishesBySection,
   fetchMoreDishes,
 } from "../../../redux/menuSlice";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IDishesQuery } from "../../../@types/request/request";
 
 interface DishesProps {}
@@ -31,6 +30,9 @@ const Dishes: FunctionComponent<DishesProps> = () => {
     pageSize: state.menu.pageSize,
     totalRecords: state.menu.totalRecords,
   }));
+  const sections = useAppSelector((state) => state.sections.data);
+  const { branchId } = useParams();
+
   const navigate = useNavigate();
   const handleSearchDishName = () => {
     const searchParams = new URLSearchParams(location.search);
@@ -57,6 +59,7 @@ const Dishes: FunctionComponent<DishesProps> = () => {
     const query: IDishesQuery = {
       pageNumber: pagination.pageNumber,
       pageSize: pagination.pageSize,
+      branchId,
     };
     if (sectionId) query.sectionId = sectionId;
     if (minPrice) query.minPrice = parseInt(minPrice);
@@ -67,6 +70,13 @@ const Dishes: FunctionComponent<DishesProps> = () => {
   useEffect(() => {
     dispatch(fetchDishesBySection(query));
   }, [dispatch, query]);
+
+  const getSelectedSectionName = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const sectionId = searchParams.get("section");
+    return sections.find((s) => s.sectionId === sectionId)?.sectionName ?? "";
+  };
+
   return (
     <>
       {openAddDishModal && (
@@ -101,7 +111,9 @@ const Dishes: FunctionComponent<DishesProps> = () => {
         </Col>
       </Row>
       <Flex justify="space-between">
-        <Typography.Title level={3}>Fast food</Typography.Title>
+        <Typography.Title level={3}>
+          {getSelectedSectionName()}
+        </Typography.Title>
       </Flex>
       <Row gutter={6} className="mt-4">
         {items.map((item) => (
@@ -115,7 +127,7 @@ const Dishes: FunctionComponent<DishesProps> = () => {
           <Col span={6}>
             <div
               onClick={() => setOpenAddDishToSectionModal(true)}
-              className="h-72 bg-white rounded-md flex justify-center items-center border-dashed border-2 border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 hover:shadow-md hover:scale-105"
+              className="h-64 bg-white rounded-md flex justify-center items-center border-dashed border-2 border-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 hover:shadow-md hover:scale-105"
             >
               <div>
                 <Flex justify="center">
@@ -131,7 +143,7 @@ const Dishes: FunctionComponent<DishesProps> = () => {
           </Col>
         )}
       </Row>
-      {pagination.pageNumber * pagination.pageSize <=
+      {pagination.pageNumber * pagination.pageSize <
         pagination.totalRecords && (
         <Flex justify="center">
           <button

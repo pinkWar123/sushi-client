@@ -37,6 +37,10 @@ const Filter: FunctionComponent<FilterProps> = () => {
   const loading = useAppSelector((state) => state.sections.loading);
   const [filter, setFilter] = useState<string>();
   const [priceRange, setPriceRange] = useState<Range>();
+  const resetFilter = () => {
+    setFilter(undefined);
+    setPriceRange({ minPrice: 0, maxPrice: 100 * 10 ** 4 });
+  };
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const filter = searchParams.get("section");
@@ -45,7 +49,7 @@ const Filter: FunctionComponent<FilterProps> = () => {
     setFilter(filter ?? undefined);
     setPriceRange({
       minPrice: minPrice !== null ? parseInt(minPrice) : 0,
-      maxPrice: maxPrice !== null ? parseInt(maxPrice) : 0,
+      maxPrice: maxPrice !== null ? parseInt(maxPrice) : 100,
     });
   }, [location.search]);
   useEffect(() => {
@@ -70,7 +74,9 @@ const Filter: FunctionComponent<FilterProps> = () => {
       <Skeleton loading={loading}>
         <Flex justify="space-between">
           <div className="text-red-500">FILTER</div>
-          <div className="text-green-500">Reset All</div>
+          <div className="text-green-500 cursor-pointer" onClick={resetFilter}>
+            Reset All
+          </div>
         </Flex>
 
         <Divider />
@@ -97,14 +103,19 @@ const Filter: FunctionComponent<FilterProps> = () => {
           included={true}
           range={true}
           // marks={marks}
-          defaultValue={[
-            priceRange?.minPrice ? priceRange.minPrice / 1000 : 0,
-            priceRange?.maxPrice ? priceRange.maxPrice / 1000 : 100,
+          value={[
+            priceRange?.minPrice ? priceRange.minPrice / 10000 : 0,
+            priceRange?.maxPrice ? priceRange.maxPrice / 10000 : 100,
           ]}
+          tooltip={{
+            formatter(value) {
+              return value === undefined ? 0 : (value * 10000).toLocaleString();
+            },
+          }}
           onChange={(values) => {
             setPriceRange({
-              minPrice: values[0] * 10 ** 3,
-              maxPrice: values[1] * 10 ** 3,
+              minPrice: values[0] * 10 ** 4,
+              maxPrice: values[1] * 10 ** 4,
             });
           }}
         />
