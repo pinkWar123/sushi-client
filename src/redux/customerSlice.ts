@@ -13,7 +13,7 @@ const initialState: ICustomerState = {
   loading: false,
   data: [],
   pageNumber: 1,
-  pageSize: 5,
+  pageSize: 10,
   firstPage: "",
   lastPage: "",
   totalPages: 0,

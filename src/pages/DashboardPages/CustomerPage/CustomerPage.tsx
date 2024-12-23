@@ -3,11 +3,12 @@ import {
   faPlus,
   faTrash,
   faUserTie,
+  faCircleUp,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Avatar,
-  Flex,
   Form,
   Input,
   message,
@@ -26,6 +27,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { formattedDate } from "../../../utils/time";
 import { rankUtils } from "../../../utils/membership";
 import { ICustomerQuery } from "../../../@types/request/request";
+import { createCardCustomer } from "../../../services/customer";
+import CreateCardModal from "./createCardModal";
+import { useAppSelector } from "../../../hooks/redux";
 
 interface CustomerPageProps {}
 
@@ -33,6 +37,63 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
   const [openCustomerModal, setOpenCustomerModal] = useState<boolean>(false);
   const [openCustomerDrawer, setOpenCustomerDrawer] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
+    null
+  );
+  const employeeId = useAppSelector((state) => state.account.employeeId);
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [activeCustomer, setActiveCustomer] = useState<ICustomer>();
+  const location = useLocation();
+  const [phone, setPhone] = useState<string>();
+  const [pagination, setPagination] = useState<{
+    current: number;
+    pageSize: number;
+    total: number;
+  }>({
+    current: 1,
+    pageSize: 10, // Changed from 5 to 10 for demonstration
+    total: 0,
+  });
+
+  const showModal = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    setIsModalVisible(true);
+  };
+
+  const handleConfirm = async () => {
+    if (selectedCustomerId) {
+      try {
+        if (!employeeId) {
+          message.error("Employee ID is required");
+          return;
+        }
+        const upgradeRes = await createCardCustomer({
+          customerId: selectedCustomerId,
+          employeeId,
+        });
+        console.log("upgrade res: ", upgradeRes);
+
+        message.success("Card created successfully");
+        setCustomers((prevCustomers) =>
+          prevCustomers.map((customer) =>
+            customer.customerId === selectedCustomerId
+              ? { ...customer, rankName: "Membership" }
+              : customer
+          )
+        );
+      } catch (error) {
+        message.error("Failed to create card");
+      }
+    }
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedCustomerId(null); // Reset the selected customer ID
+  };
+
   const columns: TableProps<ICustomer>["columns"] = [
     {
       title: "Id",
@@ -88,20 +149,23 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
           case "Gold":
             icon = <FontAwesomeIcon icon={faStar} />;
             break;
+          default:
+            icon = <FontAwesomeIcon icon={faXmark} />;
+            break;
         }
         return (
           <strong
             className={`text-xs px-2 py-1 rounded ${textColor} ${bgColor}`}
           >
-            {value} {icon}
+            {value || "No card"} {icon}
           </strong>
         );
       },
     },
     {
-      title: <div className="text-gray-400 text-xs">Spent</div>,
-      dataIndex: "spent",
-      key: "spent",
+      title: <div className="text-gray-400 text-xs">Accumulated Points</div>,
+      dataIndex: "accumulatedPoints",
+      key: "accumulatedPoints",
       render: (value) => <strong className="text-xs">{value}</strong>,
     },
     {
@@ -121,19 +185,39 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
             icon={faTrash}
             className="cursor-pointer text-red-500"
           />
+
+          {!record.rankName && (
+            <FontAwesomeIcon
+              icon={faCircleUp}
+              className="cursor-pointer text-yellow-500"
+              onClick={() => showModal(record.customerId)}
+            />
+          )}
+          <CreateCardModal
+            visible={isModalVisible}
+            onConfirm={handleConfirm}
+            onCancel={handleCancel}
+          />
         </Space>
       ),
     },
   ];
-  const [customers, setCustomers] = useState<ICustomer[]>([]);
-  const [activeCustomer, setActiveCustomer] = useState<ICustomer>();
-  const location = useLocation();
-  const [phone, setPhone] = useState<string>();
-  const [pagination, setPagination] = useState<{
-    pageNumber: number;
-    pageSize: number;
-    totalRecords: number;
-  }>();
+
+  const fetchCustomers = async (query: ICustomerQuery) => {
+    try {
+      const res = await callGetAllCustomers(query);
+      console.log("res: ", res);
+      setCustomers(res.data);
+      setPagination({
+        current: res.pageNumber,
+        pageSize: res.pageSize,
+        total: res.totalRecords,
+      });
+    } catch (error) {
+      message.error({ content: "Error fetching customers" });
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const pageNumberStr = params.get("pageNumber");
@@ -142,33 +226,28 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
     setPhone(phoneNumber ?? undefined);
     const query: ICustomerQuery = {
       pageNumber: pageNumberStr !== null ? parseInt(pageNumberStr) : 1,
-      pageSize: pageSizeStr !== null ? parseInt(pageSizeStr) : 5,
+      pageSize: pageSizeStr !== null ? parseInt(pageSizeStr) : 10, // Changed from 5 to 10 for demonstration
     };
     if (phoneNumber) query.phoneNumber = phoneNumber;
-    const fetchCustomers = async () => {
-      try {
-        const res = await callGetAllCustomers(query);
-        console.log(res);
-        setCustomers(res.data);
-        setPagination({
-          pageNumber: res.pageNumber,
-          pageSize: res.pageSize,
-          totalRecords: res.totalRecords,
-        });
-      } catch (error) {
-        message.error({ content: "Error fetching customers" });
-      }
-    };
-
-    fetchCustomers();
-  }, []);
+    fetchCustomers(query);
+  }, [location.search]);
 
   const handleSearchByPhone = () => {
     const searchParams = new URLSearchParams(location.search);
     if (phone) searchParams.set("phoneNumber", phone);
     else searchParams.delete("phoneNumber");
     navigate({
-      pathName: location.pathname,
+      pathname: location.pathname,
+      search: searchParams.toString(),
+    });
+  };
+
+  const handleTableChange = (pagination: any) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("pageNumber", pagination.current);
+    searchParams.set("pageSize", pagination.pageSize);
+    navigate({
+      pathname: location.pathname,
       search: searchParams.toString(),
     });
   };
@@ -187,12 +266,13 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
           }}
         />
       )}
-      <Flex justify="space-between">
+      <div className="flex justify-between">
         <Form.Item>
           <Input.Search
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             onPressEnter={() => handleSearchByPhone()}
+            onSearch={() => handleSearchByPhone()}
             placeholder="Search customer by phone number..."
           />
         </Form.Item>
@@ -204,9 +284,18 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
             <FontAwesomeIcon icon={faPlus} /> Add customer
           </button>
         </Form.Item>
-      </Flex>
+      </div>
       <hr className="" />
-      <Table dataSource={customers} columns={columns} {...pagination} />
+      <Table
+        dataSource={customers}
+        columns={columns}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+        }}
+        onChange={handleTableChange}
+      />
     </div>
   );
 };
