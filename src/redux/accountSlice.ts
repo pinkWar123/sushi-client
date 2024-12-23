@@ -34,6 +34,16 @@ const accountSlice = createSlice({
     setUser: (state, action: PayloadAction<string>) => {
       state.userName = action.payload;
     },
+    logOut: (state) => {
+      state.userName = null;
+      state.customerId = null;
+      state.phone = null;
+      state.dateOfBirth = null;
+      state.name = null;
+      state.branchId = null;
+      state.employeeId = null;
+      localStorage.removeItem("token");
+    },
   },
   extraReducers(builder) {
     builder
@@ -52,15 +62,13 @@ const accountSlice = createSlice({
           branchId,
           dateOfBirth,
         } = action.payload;
-        return {
-          userName,
-          name,
-          phone,
-          customerId,
-          employeeId,
-          branchId,
-          dateOfBirth,
-        };
+        state.userName = userName;
+        state.name = name;
+        state.phone = phone;
+        state.customerId = customerId;
+        state.employeeId = employeeId;
+        state.branchId = branchId;
+        state.dateOfBirth = dateOfBirth;
       })
       .addCase(getUserCredentials.rejected, () => {
         console.log("Failed");
@@ -69,4 +77,4 @@ const accountSlice = createSlice({
 });
 
 export default accountSlice.reducer;
-export const { setUser } = accountSlice.actions;
+export const { setUser, logOut } = accountSlice.actions;

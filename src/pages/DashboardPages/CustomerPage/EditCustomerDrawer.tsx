@@ -16,14 +16,20 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import { FunctionComponent } from "react";
+import { ICustomer } from "../../../@types/response/customer";
+import { rankUtils } from "../../../utils/membership";
 
 interface EditCustomerDrawerProps {
   onHide: () => void;
+  customer?: ICustomer;
 }
 
 const EditCustomerDrawer: FunctionComponent<EditCustomerDrawerProps> = ({
   onHide,
+  customer,
 }) => {
+  if (!customer) return <></>;
+  const { bgColor, textColor } = rankUtils(customer.rankName);
   return (
     <Drawer
       footer={
@@ -56,27 +62,24 @@ const EditCustomerDrawer: FunctionComponent<EditCustomerDrawerProps> = ({
 
       <Form layout="vertical">
         <Row gutter={6}>
-          <Col span={12}>
-            <Form.Item label="First name">
-              <Input value={"Ramisa "} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Last name">
-              <Input value={"Sanjana"} />
+          <Col span={24}>
+            <Form.Item label="Name">
+              <Input disabled readOnly value={customer.name} />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Gender">
               <Select
-                value={"male"}
+                disabled
+                value={customer.gender}
                 options={[
                   {
                     label: "Male",
-                    value: "male",
+                    value: "1",
                   },
                   {
                     label: "Female",
+                    value: "0",
                   },
                   {
                     label: "Other",
@@ -88,49 +91,55 @@ const EditCustomerDrawer: FunctionComponent<EditCustomerDrawerProps> = ({
           <Col span={12}>
             <Form.Item label="Date of birth">
               <DatePicker
-                value={dayjs("13/04/1976", "DD/MM/YYYY")}
-                format={"DD/MM/YYYY"}
+                disabled
+                readOnly
+                value={
+                  customer.dateOfBirth ? dayjs(customer.dateOfBirth) : null
+                }
+                format="DD/MM/YYYY"
                 className="w-full"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Citizen ID">
-              <Input value={"123456789"} />
+              <Input disabled readOnly value={customer.citizenId} />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Phone number">
-              <Input value={"123456789"} />
+              <Input disabled readOnly value={customer.phone} />
             </Form.Item>
           </Col>
           <Col span={24}>
             <Form.Item label="Email">
-              <Input prefix="@" value={"sanjana@gmail.com"} />
+              <Input prefix="@" disabled readOnly value={customer.email} />
             </Form.Item>
           </Col>
         </Row>
       </Form>
       <hr />
-      <Card className="bg-yellow-400">
-        <div className="text-white font-bold flex justify-center">
-          Gold membership
+      <Card className={`${bgColor} mt-4`}>
+        <div className={`${textColor} font-bold flex justify-center`}>
+          {customer.rankName}
         </div>
-        <Flex justify="space-between">
+        {/* <Flex justify="space-between">
           <div className=" text-xs">Discount:</div>
           <div className="font-bold text-xs">20%</div>
-        </Flex>
+        </Flex> */}
         <Flex justify="space-between">
           <div className=" text-xs">Accumulated points:</div>
-          <div className="font-bold text-xs">1970</div>
+          <div className="font-bold text-xs">{customer.accumulatedPoints}</div>
         </Flex>
-        <Flex justify="space-between">
+        {/* <Flex justify="space-between">
           <div className=" text-xs">Start date:</div>
           <div className="font-bold text-xs">13/03/2024</div>
-        </Flex>
+        </Flex> */}
         <Flex justify="space-between">
           <div className=" text-xs">Accumulated date:</div>
-          <div className="font-bold text-xs">11/07/2004</div>
+          <div className="font-bold text-xs">
+            {dayjs(customer.accumulatedDate).format("DD/MM/YYYY").toString()}
+          </div>
         </Flex>
       </Card>
     </Drawer>

@@ -1,85 +1,44 @@
-import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDumbbell,
+  faPlus,
+  faTrash,
+  faUserTie,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Avatar, Flex, Form, Space, Table, TableProps, Typography } from "antd";
-import Search from "antd/es/transfer/search";
-import { FunctionComponent, useState } from "react";
+import {
+  Avatar,
+  Flex,
+  Form,
+  Input,
+  message,
+  Space,
+  Table,
+  TableProps,
+  Typography,
+} from "antd";
+import { FunctionComponent, useEffect, useState } from "react";
 import AddCustomerModal from "./AddCustomerModal";
-import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faPenToSquare, faStar } from "@fortawesome/free-regular-svg-icons";
 import EditCustomerDrawer from "./EditCustomerDrawer";
+import { ICustomer } from "../../../@types/response/customer";
+import { callGetAllCustomers } from "../../../services/customer";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formattedDate } from "../../../utils/time";
+import { rankUtils } from "../../../utils/membership";
+import { ICustomerQuery } from "../../../@types/request/request";
 
 interface CustomerPageProps {}
-
-interface Customer {
-  name: string;
-  email: string;
-  address: string;
-  orders: number;
-  spent: number;
-}
-
-const CUSTOMERS: Customer[] = [
-  {
-    name: "Ramisa Sanjana",
-    email: "ramisa@gmail.com",
-    address: "14 Clifton Down Road, UK",
-    orders: 7,
-    spent: 3331.0,
-  },
-  {
-    name: "Mohua Amin",
-    email: "mohua@gmail.com",
-    address: "405 Kings Road, Chelsea, London",
-    orders: 44,
-    spent: 74331.0,
-  },
-  {
-    name: "Estiaq Noor",
-    email: "estiaqnoor@gmail.com",
-    address: "176 Finchley Road, London",
-    orders: 4,
-    spent: 2331.0,
-  },
-  {
-    name: "Reaz Nahid",
-    email: "reaz@hotmail.com",
-    address: "12 South Bridge, Edinburgh, UK",
-    orders: 27,
-    spent: 44131.89,
-  },
-  {
-    name: "Rabbi Amin",
-    email: "amin@yourmail.com",
-    address: "176 Finchley Road, London",
-    orders: 16,
-    spent: 7331.0,
-  },
-  {
-    name: "Sakib Al Baky",
-    email: "sakib@yahoo.com",
-    address: "405 Kings Road, Chelsea, London",
-    orders: 47,
-    spent: 8231.0,
-  },
-  {
-    name: "Maria Nur",
-    email: "maria@gmail.com",
-    address: "80 High Street, Winchester",
-    orders: 12,
-    spent: 9631.0,
-  },
-  //   {
-  //     name: "Ahmed Baky",
-  //     email: "maria@gmail.com",
-  //     address: "80 High Street, Winchester",
-  //     orders: 12,
-  //     spent: 9631.0,
-  //   },
-];
 
 const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
   const [openCustomerModal, setOpenCustomerModal] = useState<boolean>(false);
   const [openCustomerDrawer, setOpenCustomerDrawer] = useState<boolean>(false);
-  const columns: TableProps<Customer>["columns"] = [
+  const navigate = useNavigate();
+  const columns: TableProps<ICustomer>["columns"] = [
+    {
+      title: "Id",
+      dataIndex: "customerId",
+      key: "customerId",
+    },
     {
       title: <div className="text-gray-400 text-xs">Customer</div>,
       dataIndex: "name",
@@ -103,20 +62,41 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
       render: (value) => <span className="text-xs">{value}</span>,
     },
     {
-      title: <div className="text-gray-400 text-xs">Location</div>,
-      dataIndex: "address",
-      key: "address",
+      title: <div className="text-gray-400 text-xs">Date of birth</div>,
+      dataIndex: "dateOfBirth",
+      key: "dateOfBirth",
       render: (value) => (
         <Typography.Text ellipsis={{ tooltip: true }} className="text-xs w-40">
-          {value}
+          {formattedDate(value)}
         </Typography.Text>
       ),
     },
     {
-      title: <div className="text-gray-400 text-xs">Orders</div>,
-      dataIndex: "orders",
-      key: "orders",
-      render: (value) => <strong className="text-xs">{value}</strong>,
+      title: <div className="text-gray-400 text-xs">Rank</div>,
+      dataIndex: "rankName",
+      key: "rankName",
+      render: (value) => {
+        let icon;
+        const { bgColor, textColor } = rankUtils(value);
+        switch (value) {
+          case "Membership":
+            icon = <FontAwesomeIcon icon={faUserTie} />;
+            break;
+          case "Silver":
+            icon = <FontAwesomeIcon icon={faDumbbell} />;
+            break;
+          case "Gold":
+            icon = <FontAwesomeIcon icon={faStar} />;
+            break;
+        }
+        return (
+          <strong
+            className={`text-xs px-2 py-1 rounded ${textColor} ${bgColor}`}
+          >
+            {value} {icon}
+          </strong>
+        );
+      },
     },
     {
       title: <div className="text-gray-400 text-xs">Spent</div>,
@@ -127,12 +107,15 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
     {
       title: <div className="text-gray-400 text-xs">Action</div>,
       key: "action",
-      render: () => (
+      render: (_, record) => (
         <Space>
           <FontAwesomeIcon
             className="cursor-pointer text-violet-500"
             icon={faPenToSquare}
-            onClick={() => setOpenCustomerDrawer(true)}
+            onClick={() => {
+              setActiveCustomer(record);
+              setOpenCustomerDrawer(true);
+            }}
           />
           <FontAwesomeIcon
             icon={faTrash}
@@ -142,17 +125,76 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
       ),
     },
   ];
+  const [customers, setCustomers] = useState<ICustomer[]>([]);
+  const [activeCustomer, setActiveCustomer] = useState<ICustomer>();
+  const location = useLocation();
+  const [phone, setPhone] = useState<string>();
+  const [pagination, setPagination] = useState<{
+    pageNumber: number;
+    pageSize: number;
+    totalRecords: number;
+  }>();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const pageNumberStr = params.get("pageNumber");
+    const pageSizeStr = params.get("pageSize");
+    const phoneNumber = params.get("phoneNumber");
+    setPhone(phoneNumber ?? undefined);
+    const query: ICustomerQuery = {
+      pageNumber: pageNumberStr !== null ? parseInt(pageNumberStr) : 1,
+      pageSize: pageSizeStr !== null ? parseInt(pageSizeStr) : 5,
+    };
+    if (phoneNumber) query.phoneNumber = phoneNumber;
+    const fetchCustomers = async () => {
+      try {
+        const res = await callGetAllCustomers(query);
+        console.log(res);
+        setCustomers(res.data);
+        setPagination({
+          pageNumber: res.pageNumber,
+          pageSize: res.pageSize,
+          totalRecords: res.totalRecords,
+        });
+      } catch (error) {
+        message.error({ content: "Error fetching customers" });
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  const handleSearchByPhone = () => {
+    const searchParams = new URLSearchParams(location.search);
+    if (phone) searchParams.set("phoneNumber", phone);
+    else searchParams.delete("phoneNumber");
+    navigate({
+      pathName: location.pathname,
+      search: searchParams.toString(),
+    });
+  };
+
   return (
     <div className="min-h-screen">
       {openCustomerModal && (
         <AddCustomerModal onHide={() => setOpenCustomerModal(false)} />
       )}
       {openCustomerDrawer && (
-        <EditCustomerDrawer onHide={() => setOpenCustomerDrawer(false)} />
+        <EditCustomerDrawer
+          customer={activeCustomer}
+          onHide={() => {
+            setActiveCustomer(undefined);
+            setOpenCustomerDrawer(false);
+          }}
+        />
       )}
       <Flex justify="space-between">
         <Form.Item>
-          <Search placeholder="Search customer..." />
+          <Input.Search
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onPressEnter={() => handleSearchByPhone()}
+            placeholder="Search customer by phone number..."
+          />
         </Form.Item>
         <Form.Item>
           <button
@@ -164,7 +206,7 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
         </Form.Item>
       </Flex>
       <hr className="" />
-      <Table dataSource={CUSTOMERS} columns={columns} />
+      <Table dataSource={customers} columns={columns} {...pagination} />
     </div>
   );
 };

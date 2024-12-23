@@ -12,68 +12,19 @@ import {
 import Input from "antd/es/input/Input";
 import { FunctionComponent } from "react";
 import { IEmployee } from "../../../@types/response/employee";
+import { useAppSelector } from "../../../hooks/redux";
 
 interface EmployeeEditDrawerProps {
   onHide: () => void;
   employee: IEmployee;
 }
 
-const branches = [
-  {
-    name: "SpiceStreet Grill - Downtown Branch",
-    location: "101 Main St, Downtown City Center",
-    uniqueFeature: "Known for weekly 'Grill Nights' with live music",
-    manager: "Sarah Thompson",
-    contact: "(555) 123-4567",
-  },
-  {
-    name: "SpiceStreet Grill - Riverside Branch",
-    location: "200 Riverwalk Dr, Riverside District",
-    uniqueFeature: "Beautiful outdoor patio with river views",
-    manager: "Jake Morrison",
-    contact: "(555) 234-5678",
-  },
-  {
-    name: "SpiceStreet Grill - Uptown Branch",
-    location: "300 Uptown Ave, Uptown Plaza",
-    uniqueFeature: "Upscale ambiance with a VIP lounge area",
-    manager: "Linda Green",
-    contact: "(555) 345-6789",
-  },
-  {
-    name: "SpiceStreet Grill - Suburban Branch",
-    location: "150 Suburban Mall Rd, Suburban Mall",
-    uniqueFeature: "Kid-friendly, with a play area and family deals",
-    manager: "Tom Baker",
-    contact: "(555) 456-7890",
-  },
-  {
-    name: "SpiceStreet Grill - Airport Branch",
-    location: "Terminal 3, City Airport",
-    uniqueFeature: "Quick-serve for travelers, grab-and-go meals",
-    manager: "Emily Chen",
-    contact: "(555) 567-8901",
-  },
-  {
-    name: "SpiceStreet Grill - Beachfront Branch",
-    location: "1 Ocean Blvd, Beachfront Area",
-    uniqueFeature: "Seasonal seafood specials and sunset views",
-    manager: "Ryan Lee",
-    contact: "(555) 678-9012",
-  },
-  {
-    name: "SpiceStreet Grill - Midtown Branch",
-    location: "500 Midtown St, Business District",
-    uniqueFeature: "Power lunches for business professionals",
-    manager: "Dana Collins",
-    contact: "(555) 789-0123",
-  },
-];
-
 const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
   onHide,
   employee,
 }) => {
+  const branches = useAppSelector((state) => state.clientSections.branches);
+  console.log(employee);
   return (
     <Drawer
       footer={
@@ -106,7 +57,7 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
         <Row gutter={8}>
           <Col span={12}>
             <Form.Item label="Position">
-              <Input value={"Chef"} />
+              <Input value={employee.departmentName} />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -159,8 +110,10 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
         </Row>
         <Form.Item label="Branch">
           <Select
+            value={employee.branchId}
             options={branches.map((branch) => ({
               label: branch.name,
+              value: branch.branchId,
             }))}
           />
         </Form.Item>

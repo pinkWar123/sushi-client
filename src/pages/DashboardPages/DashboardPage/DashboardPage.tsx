@@ -1,199 +1,94 @@
-import { faDollarSign, faSortUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Card,
   Col,
+  DatePicker,
   Divider,
   Flex,
-  Form,
   Row,
-  Select,
-  Space,
+  TimeRangePickerProps,
   Typography,
 } from "antd";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import EarningsChart from "./EarningChart";
+import { useAppDispatch } from "../../../hooks/redux";
+import {
+  getRevenueByDateRange,
+  getTopDishesByDateRange,
+  getWorstDishesByDateRange,
+} from "../../../redux/branchSlice";
+import { useParams } from "react-router-dom";
+import dayjs, { Dayjs } from "dayjs";
+import TopDishes from "./TopDishes";
+import WorstDishes from "./WorstDishes";
 
 export interface DashboardPageProps {}
 
+const initialDates: [Dayjs, Dayjs] = [
+  dayjs().subtract(7, "days"), // Start date: 7 days ago
+  dayjs(), // End date: Today
+];
+
 const _DashboardPage: FunctionComponent<DashboardPageProps> = () => {
+  const { branchId } = useParams();
+  const dispatch = useAppDispatch();
+  const rangePresets: TimeRangePickerProps["presets"] = [
+    { label: "Last 7 Days", value: [dayjs().add(-7, "d"), dayjs()] },
+    { label: "Last 14 Days", value: [dayjs().add(-14, "d"), dayjs()] },
+    { label: "Last 30 Days", value: [dayjs().add(-30, "d"), dayjs()] },
+    { label: "Last 90 Days", value: [dayjs().add(-90, "d"), dayjs()] },
+  ];
+
+  const onRangeChange = async (
+    dates: null | (Dayjs | null)[],
+    dateStrings: string[]
+  ) => {
+    if (dates) {
+      console.log("From: ", dates[0], ", to: ", dates[1]);
+      console.log("From: ", dateStrings[0], ", to: ", dateStrings[1]);
+      const args = {
+        branchId: branchId ?? "",
+        startDate: dateStrings[0],
+        endDate: dateStrings[1],
+      };
+      await Promise.all([
+        dispatch(getRevenueByDateRange(args)),
+        dispatch(getTopDishesByDateRange(args)),
+        dispatch(getWorstDishesByDateRange(args)),
+      ]);
+    } else {
+      console.log("Clear");
+    }
+  };
+
+  useEffect(() => {
+    dispatch(
+      getRevenueByDateRange({
+        branchId: branchId ?? "",
+        startDate: initialDates[0].toString(),
+        endDate: initialDates[1].toString(),
+      })
+    );
+  }, [dispatch]);
   return (
     <>
       <Flex justify="space-between">
         <Typography.Title level={3}>Dashboard</Typography.Title>
-        <Form.Item label="Filter">
-          <Select
-            value={"week"}
-            options={[
-              {
-                label: "Week",
-                value: "week",
-              },
-              {
-                label: "Month",
-              },
-              {
-                label: "Year",
-              },
-            ]}
-          />
-        </Form.Item>
       </Flex>
-      <Row gutter={16}>
-        <Col lg={6} md={6} sm={12} xs={24}>
-          <Card>
-            <Flex justify="center">
-              <FontAwesomeIcon
-                className="text-white bg-purple-500 rounded-full p-2"
-                icon={faDollarSign}
-              />
-            </Flex>
-            <div className="flex justify-center items-center ml-2 mt-2">
-              <strong>$10,236</strong>
-              <Space size={"small"} className="text-green-400 text-xs ml-2  ">
-                <FontAwesomeIcon className="mt-2" icon={faSortUp} />
-                <div className="-ml-0.5">3.5%</div>
-              </Space>
-            </div>
-            <Flex justify="center">
-              <span className="text-stone-400">Total earning</span>
-            </Flex>
-          </Card>
-        </Col>
-        <Col lg={6} md={6} sm={12} xs={24}>
-          <Card>
-            <Flex justify="center">
-              <FontAwesomeIcon
-                className="text-white bg-purple-500 rounded-full p-2"
-                icon={faDollarSign}
-              />
-            </Flex>
-            <div className="flex justify-center items-center ml-2 mt-2">
-              <strong>$10,236</strong>
-              <Space size={"small"} className="text-green-400 text-xs ml-2  ">
-                <FontAwesomeIcon className="mt-2" icon={faSortUp} />
-                <div className="-ml-0.5">3.5%</div>
-              </Space>
-            </div>
-            <Flex justify="center">
-              <span className="text-stone-400">Total earning</span>
-            </Flex>
-          </Card>
-        </Col>
-        <Col lg={6} md={6} sm={12} xs={24}>
-          <Card>
-            <Flex justify="center">
-              <FontAwesomeIcon
-                className="text-white bg-purple-500 rounded-full p-2"
-                icon={faDollarSign}
-              />
-            </Flex>
-            <div className="flex justify-center items-center ml-2 mt-2">
-              <strong>$10,236</strong>
-              <Space size={"small"} className="text-green-400 text-xs ml-2  ">
-                <FontAwesomeIcon className="mt-2" icon={faSortUp} />
-                <div className="-ml-0.5">3.5%</div>
-              </Space>
-            </div>
-            <Flex justify="center">
-              <span className="text-stone-400">Total earning</span>
-            </Flex>
-          </Card>
-        </Col>
-        <Col lg={6} md={6} sm={12} xs={24}>
-          <Card>
-            <Flex justify="center">
-              <FontAwesomeIcon
-                className="text-white bg-purple-500 rounded-full p-2"
-                icon={faDollarSign}
-              />
-            </Flex>
-            <div className="flex justify-center items-center ml-2 mt-2">
-              <strong>$10,236</strong>
-              <Space size={"small"} className="text-green-400 text-xs ml-2  ">
-                <FontAwesomeIcon className="mt-2" icon={faSortUp} />
-                <div className="-ml-0.5">3.5%</div>
-              </Space>
-            </div>
-            <Flex justify="center">
-              <span className="text-stone-400">Total earning</span>
-            </Flex>
-          </Card>
-        </Col>
-      </Row>
+      <DatePicker.RangePicker
+        defaultValue={initialDates}
+        presets={rangePresets}
+        onChange={onRangeChange}
+      />
 
       <Row gutter={16} className="mt-8">
         <Col span={16}>
           <EarningsChart />
         </Col>
         <Col span={8}>
-          <Card>
-            <Row>
-              <Col span={18}>
-                <Typography.Title level={4}>Top selling items</Typography.Title>
-              </Col>
-              <Col span={6}>
-                <a href="#">View all</a>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={18}>
-                <Flex gap={"middle"}>
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg/440px-Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg"
-                    alt=""
-                    className="w-8 h-8"
-                  />
-                  <div>
-                    <strong className="text-sm">Pizza Margherita</strong>
-                    <div className="text-stone-400 text-xs">Deef coffee</div>
-                  </div>
-                </Flex>
-              </Col>
-              <Col span={6}>
-                <strong>$ 14.24</strong>
-              </Col>
-              <Divider />
-            </Row>
-            <Row>
-              <Col span={18}>
-                <Flex gap={"middle"}>
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg/440px-Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg"
-                    alt=""
-                    className="w-8 h-8"
-                  />
-                  <div>
-                    <strong className="text-sm">Pizza Margherita</strong>
-                    <div className="text-stone-400 text-xs">Deef coffee</div>
-                  </div>
-                </Flex>
-              </Col>
-              <Col span={6}>
-                <strong>$ 14.24</strong>
-              </Col>
-              <Divider />
-            </Row>
-            <Row>
-              <Col span={18}>
-                <Flex gap={"middle"}>
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg/440px-Pizza_Vi%E1%BB%87t_Nam_%C4%91%E1%BA%BF_d%C3%A0y%2C_x%C3%BAc_x%C3%ADch_%28SNaT_2018%29_%287%29.jpg"
-                    alt=""
-                    className="w-8 h-8"
-                  />
-                  <div>
-                    <strong className="text-sm">Pizza Margherita</strong>
-                    <div className="text-stone-400 text-xs">Deef coffee</div>
-                  </div>
-                </Flex>
-              </Col>
-              <Col span={6}>
-                <strong>$ 14.24</strong>
-              </Col>
-              <Divider />
-            </Row>
-          </Card>
+          <TopDishes />
+          <div className="mt-4">
+            <WorstDishes />
+          </div>
         </Col>
       </Row>
     </>

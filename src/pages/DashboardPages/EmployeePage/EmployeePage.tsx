@@ -7,6 +7,7 @@ import {
 import {
   faBriefcase,
   faCodeBranch,
+  faMoneyBill,
   faTrash,
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
@@ -32,32 +33,16 @@ import {
   fetchEmployee,
   resetPagination,
   selectEmployee,
-  updatePageSize,
 } from "../../../redux/employeeSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IEmployeeQuery } from "../../../@types/request/request";
+import { fetchBranches } from "../../../redux/client/clientSectionSlice";
+import { IDepartmentResponse } from "../../../@types/response/department";
+import { callGetAllDepartments } from "../../../services/department";
 
 interface EmployeePageProps {}
 
-interface Employee {
-  id: string;
-  name: string;
-  department: string;
-  contact: string;
-  joinedDate: string;
-  branch: string;
-}
-
 const DEPARTMENTS = ["chef", "waiter", "cashier"];
-
-interface Employee {
-  id: string;
-  name: string;
-  department: string;
-  contact: string;
-  joinedDate: string;
-  branch: string;
-}
 
 const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
@@ -65,6 +50,8 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeEmployee, setActiveEmployee] = useState<IEmployee>();
+  const [departments, setDepartments] = useState<IDepartmentResponse>([]);
+  const branches = useAppSelector((state) => state.clientSections.branches);
   const {
     data: employee,
     loading,
@@ -79,6 +66,8 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
       pageNumber: parseInt(params.get("pageNumber") ?? "") || pageNumber,
       pageSize: parseInt(params.get("pageSize") ?? "") || pageSize,
     };
+    const departmentId = params.get("departmentId");
+    if (departmentId) queryObj.departmentId = departmentId;
     const name = params.get("name");
     if (name) {
       queryObj.name = name;
@@ -86,8 +75,25 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
     return queryObj;
   }, [location.search]);
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const name = searchParams.get("name") || undefined;
+    const departmentId = searchParams.get("departmentId") || "";
+    form.setFieldsValue({ name, departmentId });
     dispatch(fetchEmployee(query));
   }, [dispatch, query]);
+
+  useEffect(() => {
+    if (!branches.length) dispatch(fetchBranches());
+  }, []);
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      const res = await callGetAllDepartments();
+
+      setDepartments(res);
+    };
+
+    fetchDepartments();
+  }, []);
 
   const columns: TableProps<IEmployee>["columns"] = [
     {
@@ -119,7 +125,7 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
           <FontAwesomeIcon icon={faBriefcase} /> Department
         </Space>
       ),
-      dataIndex: "department",
+      dataIndex: "departmentName",
       key: "department",
       render: (value) => <strong className="text-xs">{value}</strong>,
       width: "10%",
@@ -127,10 +133,10 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
     {
       title: (
         <Space>
-          <FontAwesomeIcon icon={faAddressBook} /> Contact
+          <FontAwesomeIcon icon={faMoneyBill} /> Salary
         </Space>
       ),
-      dataIndex: "contact",
+      dataIndex: "salary",
       key: "contact",
       render: (value) => (
         <div className="text-blue-400 rounded-md ring-1 ring-gray-200 text-xs px-4 w-fit font-bold">
@@ -142,20 +148,10 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
     {
       title: (
         <Space>
-          <FontAwesomeIcon icon={faCalendarDays} /> Joined
-        </Space>
-      ),
-      dataIndex: "joinedDate",
-      key: "joinedDate",
-      render: (value) => <strong className="text-xs">{value}</strong>,
-    },
-    {
-      title: (
-        <Space>
           <FontAwesomeIcon icon={faCodeBranch} /> Branch
         </Space>
       ),
-      dataIndex: "branch",
+      dataIndex: "branchName",
       key: "branch",
       render: (value) => <strong className="text-xs">{value}</strong>,
     },
@@ -187,12 +183,16 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
     params.delete("pageSize");
     if (filters.name) params.set("name", filters.name);
     else params.delete("name");
+    if (filters.departmentId !== "")
+      params.set("departmentId", filters.departmentId ?? "");
+    else params.delete("departmentId");
     dispatch(resetPagination());
     navigate({
       pathname: location.pathname,
       search: params.toString(),
     });
   };
+
   const handleChangePage = (pageNumber: number) => {
     const search = new URLSearchParams(location.search);
     search.set("pageNumber", pageNumber.toString());
@@ -239,14 +239,29 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
           <Form.Item className="w-64" name={"name"}>
             <Input placeholder="Employee name" onPressEnter={handleSearch} />
           </Form.Item>
-          <Form.Item className="w-32">
+          <Form.Item name={"departmentId"} className="w-32">
             <Select
               placeholder="Department"
-              options={DEPARTMENTS.map((department) => ({
-                label: department,
-                value: department,
-              }))}
+              // value={}
+              options={[
+                ...departments.map((department) => ({
+                  label: department.departmentName,
+                  value: department.departmentId,
+                })),
+                {
+                  label: "All",
+                  value: "",
+                },
+              ]}
             />
+          </Form.Item>
+          <Form.Item>
+            <button
+              onClick={() => handleSearch()}
+              className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-1 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Search
+            </button>
           </Form.Item>
         </Space>
       </Form>

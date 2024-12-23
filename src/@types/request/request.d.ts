@@ -17,7 +17,15 @@ export interface IDishesQuery extends IBasePaginatedQuery {
   branchId?: string;
 }
 
-export interface ICustomerQuery extends IBasePaginatedQuery {}
+export interface ITopDishesQuery {
+  branchId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface ICustomerQuery extends IBasePaginatedQuery {
+  phoneNumber?: string;
+}
 
 export interface IDetailedReservationCardsQuery {
   branchId: string;

@@ -6,6 +6,7 @@ import { ICreateReservationRequest } from "../../@types/request/request";
 import { useAppSelector } from "../../hooks/redux";
 import { callCreateReservation } from "../../services/reservation";
 import { message } from "antd";
+import { useNavigate } from "react-router-dom";
 
 interface BookingPageProps {}
 const BookingPage: FunctionComponent<BookingPageProps> = () => {
@@ -55,11 +56,13 @@ const BookingPage: FunctionComponent<BookingPageProps> = () => {
           }
     );
   };
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     callCreateReservation(formData);
     message.success("Ban da dat ban thanh cong");
+    navigate("/welcome");
   };
 
   return (
