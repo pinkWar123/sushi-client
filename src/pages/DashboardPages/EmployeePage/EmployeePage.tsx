@@ -42,8 +42,6 @@ import { callGetAllDepartments } from "../../../services/department";
 
 interface EmployeePageProps {}
 
-const DEPARTMENTS = ["chef", "waiter", "cashier"];
-
 const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
   const [form] = Form.useForm<IEmployeeQuery>();
@@ -151,9 +149,13 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
           <FontAwesomeIcon icon={faCodeBranch} /> Branch
         </Space>
       ),
-      dataIndex: "branchName",
+      dataIndex: "branchId",
       key: "branch",
-      render: (value) => <strong className="text-xs">{value}</strong>,
+      render: (value) => (
+        <strong className="text-xs">
+          {branches.find((b) => b.branchId === value)?.name}
+        </strong>
+      ),
     },
     {
       title: "Action",

@@ -75,3 +75,8 @@ export interface ISurvey {
 export interface ICreateSurveyRequest extends ISurvey {
   invoiceId: string;
 }
+
+export interface IChangeEmployeeBranchQuery {
+  employeeId: string;
+  newBranchId: string;
+}

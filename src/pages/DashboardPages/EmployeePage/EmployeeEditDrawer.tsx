@@ -6,13 +6,15 @@ import {
   Flex,
   Form,
   InputNumber,
+  notification,
   Row,
   Select,
 } from "antd";
 import Input from "antd/es/input/Input";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import { IEmployee } from "../../../@types/response/employee";
-import { useAppSelector } from "../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import { changeEmployeeBranch } from "../../../redux/employeeSlice";
 
 interface EmployeeEditDrawerProps {
   onHide: () => void;
@@ -24,7 +26,27 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
   employee,
 }) => {
   const branches = useAppSelector((state) => state.clientSections.branches);
-  console.log(employee);
+  const [branchId, setBranchId] = useState<string>(employee.branchId);
+  const dispatch = useAppDispatch();
+  const handleChangeEmployeeBranch = async () => {
+    try {
+      dispatch(
+        changeEmployeeBranch({
+          newBranchId: branchId,
+          employeeId: employee.id,
+        })
+      );
+      notification.success({
+        message: `Change branch of employee ${employee.name} successfully`,
+      });
+      onHide();
+    } catch (error) {
+      notification.error({
+        message: `Failed to change employee ${employee.name}`,
+      });
+    }
+  };
+
   return (
     <Drawer
       footer={
@@ -35,7 +57,10 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
           >
             Cancel
           </button>
-          <button className="rounded-md bg-violet-500 py-1 px-4 text-white">
+          <button
+            onClick={handleChangeEmployeeBranch}
+            className="rounded-md bg-violet-500 py-1 px-4 text-white"
+          >
             Save
           </button>
         </Flex>
@@ -110,7 +135,8 @@ const EmployeeEditDrawer: FunctionComponent<EmployeeEditDrawerProps> = ({
         </Row>
         <Form.Item label="Branch">
           <Select
-            value={employee.branchId}
+            value={branchId}
+            onChange={(value) => setBranchId(value)}
             options={branches.map((branch) => ({
               label: branch.name,
               value: branch.branchId,

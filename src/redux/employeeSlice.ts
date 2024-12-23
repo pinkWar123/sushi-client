@@ -1,7 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IEmployee } from "../@types/response/employee";
-import { callGetEmployee } from "../services/employee";
-import { IEmployeeQuery } from "../@types/request/request";
+import {
+  callChangeEmployeeBranch,
+  callGetEmployee,
+} from "../services/employee";
+import {
+  IChangeEmployeeBranchQuery,
+  IEmployeeQuery,
+} from "../@types/request/request";
 import { IPagedResponse } from "../@types/response/response";
 import { RootState } from "./store";
 
@@ -27,6 +33,14 @@ export const fetchEmployee = createAsyncThunk(
   async (query: IEmployeeQuery) => {
     const res = await callGetEmployee(query);
     return res.data;
+  }
+);
+
+export const changeEmployeeBranch = createAsyncThunk(
+  "employee/change-branch",
+  async (query: IChangeEmployeeBranchQuery) => {
+    await callChangeEmployeeBranch(query);
+    return { employeeId: query.employeeId, branchId: query.newBranchId };
   }
 );
 
@@ -57,6 +71,23 @@ const employeeSlice = createSlice({
       .addCase(fetchEmployee.rejected, (state) => {
         state.loading = false;
       });
+
+    builder.addCase(changeEmployeeBranch.fulfilled, (state, action) => {
+      const employee = state.data.find(
+        (employee) => employee.id === action.payload.employeeId
+      );
+      if (employee) {
+        console.log("old branch:", employee.branchId);
+        console.log("new branch:", action.payload.branchId);
+        employee.branchId = action.payload.branchId;
+      }
+
+      // state.data = state.data.map((employee) =>
+      //   employee.id === action.payload.employeeId
+      //     ? { ...employee, branchId: action.payload.branchId }
+      //     : employee
+      // );
+    });
   },
 });
 
