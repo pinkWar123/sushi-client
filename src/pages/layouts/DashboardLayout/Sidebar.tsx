@@ -1,6 +1,7 @@
 import { faStickyNote } from "@fortawesome/free-regular-svg-icons";
 import {
   faCog,
+  faFileInvoice,
   faGauge,
   faHamburger,
   faSignOutAlt,
@@ -47,6 +48,10 @@ const items: NavigateItemProps[] = [
   {
     icon: <FontAwesomeIcon icon={faUsers} />,
     title: "Customers",
+  },
+  {
+    icon: <FontAwesomeIcon icon={faFileInvoice} />,
+    title: "Invoices",
   },
 ];
 

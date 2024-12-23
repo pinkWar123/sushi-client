@@ -37,6 +37,12 @@ export const PUBLIC_ROUTES = [
           () => import("../pages/DashboardPages/CustomerPage/CustomerPage")
         ),
       },
+      {
+        path: PATH.DASHBOARD.outlet.invoice,
+        component: lazy(
+          () => import("../pages/DashboardPages/InvoicePage/InvoicesPage")
+        ),
+      },
     ],
   },
   {

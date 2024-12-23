@@ -80,3 +80,10 @@ export interface IChangeEmployeeBranchQuery {
   employeeId: string;
   newBranchId: string;
 }
+
+export interface IUserInvoiceQuery {
+  branchId: string;
+  customerName?: string;
+  startDate: string;
+  endDate: string;
+}

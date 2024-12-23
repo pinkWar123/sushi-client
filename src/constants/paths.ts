@@ -8,6 +8,7 @@ export const PATH = {
       order: "orders",
       employee: "employee",
       customer: "customers",
+      invoice: "invoices",
     },
   },
   LOGIN: {
