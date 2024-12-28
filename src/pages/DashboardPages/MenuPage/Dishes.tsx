@@ -30,6 +30,7 @@ const Dishes: FunctionComponent<DishesProps> = () => {
     pageSize: state.menu.pageSize,
     totalRecords: state.menu.totalRecords,
   }));
+  console.log(pagination);
   const sections = useAppSelector((state) => state.sections.data);
   const { branchId } = useParams();
 
@@ -147,9 +148,12 @@ const Dishes: FunctionComponent<DishesProps> = () => {
         pagination.totalRecords && (
         <Flex justify="center">
           <button
-            className="rounded-full ring-1 ring-red-500 py-1 px-4"
+            className="rounded-full ring-1 ring-red-500 py-1 px-4 mb-10"
             onClick={async () => {
-              const newQuery = { ...query, pageNumber: query.pageNumber + 1 };
+              const newQuery = {
+                ...query,
+                pageNumber: pagination.pageNumber + 1,
+              };
               await dispatch(fetchMoreDishes(newQuery));
             }}
           >

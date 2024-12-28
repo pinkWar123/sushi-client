@@ -39,6 +39,7 @@ import { IEmployeeQuery } from "../../../@types/request/request";
 import { fetchBranches } from "../../../redux/client/clientSectionSlice";
 import { IDepartmentResponse } from "../../../@types/response/department";
 import { callGetAllDepartments } from "../../../services/department";
+import { formatMoney } from "../../../utils/money";
 
 interface EmployeePageProps {}
 
@@ -138,7 +139,7 @@ const EmployeePage: FunctionComponent<EmployeePageProps> = () => {
       key: "contact",
       render: (value) => (
         <div className="text-blue-400 rounded-md ring-1 ring-gray-200 text-xs px-4 w-fit font-bold">
-          {value}
+          {formatMoney(value)}
         </div>
       ),
       width: "15%",

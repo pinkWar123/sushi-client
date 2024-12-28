@@ -2,6 +2,7 @@ import { Modal, Select, Table, TableProps } from "antd";
 import { FunctionComponent } from "react";
 import { IOrderDetail } from "../../../@types/response/order";
 import { OrderStatus } from "../../../constants/order";
+import { formatMoney } from "../../../utils/money";
 
 interface OrderDetailProps {
   onHide: () => void;
@@ -25,6 +26,7 @@ const columns: TableProps<DishProps>["columns"] = [
     title: "Price",
     dataIndex: "price",
     key: "dish",
+    render: (value) => formatMoney(value),
   },
   {
     title: "Quantity",

@@ -65,9 +65,10 @@ const OrderPage: FunctionComponent<OrderPageProps> = () => {
 
   const renderOrders = () => {
     const satisfiedData = data.filter((order) => order.status === status);
+    console.log(satisfiedData);
     if (satisfiedData.length === 0) return <Empty />;
     return satisfiedData.map((item, index) => (
-      <Col className="mb-4" span={8} key={`order-${index}`}>
+      <Col className="mb-4" span={8} key={`order-${item.reservationId}`}>
         <OrderItem info={item} />
       </Col>
     ));

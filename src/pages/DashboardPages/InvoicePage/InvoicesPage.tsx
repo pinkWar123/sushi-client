@@ -18,8 +18,10 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import dayjs, { Dayjs } from "dayjs";
 import { IUserInvoiceQuery } from "../../../@types/request/request";
 import {
+  faList,
   faMoneyBillTrendUp,
   faMoneyBillWave,
+  faPercent,
   faPhone,
   faSignal,
 } from "@fortawesome/free-solid-svg-icons";
@@ -31,6 +33,7 @@ import {
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
 import { faPaypal } from "@fortawesome/free-brands-svg-icons";
+import { formatMoney } from "../../../utils/money";
 
 interface InvoicesPageProps {}
 
@@ -103,6 +106,40 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
             </span>
           );
         }
+      },
+    },
+    {
+      dataIndex: "total",
+      key: "total",
+      title: (
+        <p className="flex items-center space-x-2">
+          <FontAwesomeIcon icon={faList} />
+          <span>Total</span>
+        </p>
+      ),
+      render(value) {
+        return (
+          <span className="text-red-600 font-semibold">
+            {formatMoney(value)}
+          </span>
+        );
+      },
+    },
+    {
+      dataIndex: "afterDiscount",
+      key: "afterDiscount",
+      title: (
+        <p className="flex items-center space-x-2">
+          <FontAwesomeIcon icon={faPercent} />
+          <span>After Discount</span>
+        </p>
+      ),
+      render(value) {
+        return (
+          <span className="text-green-600 font-semibold">
+            {formatMoney(value)}
+          </span>
+        );
       },
     },
     {

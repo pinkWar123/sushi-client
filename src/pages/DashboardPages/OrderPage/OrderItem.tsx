@@ -6,12 +6,17 @@ import { formattedDate, formattedTime } from "../../../utils/time";
 import { OrderStatus } from "../../../constants/order";
 import PlacedFooter from "./PlacedFooter";
 import InProgressFooter from "./InProgressFooter";
+import { formatMoney } from "../../../utils/money";
 
 interface OrderItemProps {
   info: IReservation;
 }
 
 const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
+  const caculateMoney = () =>
+    info.orderDetails
+      .map((o) => o.price * o.quantity)
+      .reduce((a, b) => a + b, 0);
   return (
     <>
       <Card>
@@ -80,7 +85,7 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
                   className="text-xs"
                   ellipsis={{ rows: 1 }}
                 >
-                  ${detail.price}
+                  {formatMoney(detail.price)}
                 </Typography.Paragraph>
               </Col>
             </Row>
@@ -95,15 +100,19 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
         </Divider>
         <Flex justify="space-between">
           <div className="font-bold">Total</div>
-          <div className="font-bold">${info.totalPrice}</div>
+          <div className="font-bold">{formatMoney(caculateMoney())}</div>
         </Flex>
 
         <Row gutter={16} className="mt-4" justify="center">
           {info.status === OrderStatus.Placed && (
             <PlacedFooter reservationId={info.reservationId} />
           )}
-          {info.status === OrderStatus.InProgress && (
-            <InProgressFooter info={info} />
+          {(info.status === OrderStatus.InProgress ||
+            info.status === OrderStatus.Done) && (
+            <InProgressFooter
+              info={info}
+              paybillBtn={info.status === OrderStatus.InProgress}
+            />
           )}
         </Row>
       </Card>

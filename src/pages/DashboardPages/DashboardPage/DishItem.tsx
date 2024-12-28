@@ -23,7 +23,7 @@ const DishItem: FunctionComponent<DishItemProps> = ({ dishName, orders }) => {
         </Flex>
       </Col>
       <Col span={6}>
-        <strong>{orders}</strong>
+        <strong>Order: {orders}</strong>
       </Col>
       <Divider />
     </Row>

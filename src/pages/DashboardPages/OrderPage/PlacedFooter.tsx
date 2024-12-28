@@ -42,6 +42,7 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
     <>
       <Col span={12}>
         <Select
+          key={`select-${reservationId}`}
           onChange={(value) => setSelectedTableId(value)}
           value={selectedTableId}
           className="w-100"

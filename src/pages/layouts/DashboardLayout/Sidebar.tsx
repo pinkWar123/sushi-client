@@ -80,7 +80,7 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
         }`}
       >
         <Space className={`ml-8`}>
-          <div>{props.icon}</div>
+          <div className="w-4">{props.icon}</div>
           <div
             className={`hover:text-violet-700 ${
               props.isActive ? "text-violet-700   " : "text-zinc-400"

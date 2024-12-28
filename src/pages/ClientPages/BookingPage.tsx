@@ -7,6 +7,7 @@ import { useAppSelector } from "../../hooks/redux";
 import { callCreateReservation } from "../../services/reservation";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { formatMoney } from "../../utils/money";
 
 interface BookingPageProps {}
 const BookingPage: FunctionComponent<BookingPageProps> = () => {
@@ -121,7 +122,9 @@ const BookingPage: FunctionComponent<BookingPageProps> = () => {
               {selectedDish.dish.dishName} x {selectedDish.quantity}
             </strong>
             <strong className="flex items-center">
-              {selectedDish.dish.currentPrice * selectedDish.quantity}
+              {formatMoney(
+                selectedDish.dish.currentPrice * selectedDish.quantity
+              )}
             </strong>
           </div>
         ))}

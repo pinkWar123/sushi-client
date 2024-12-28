@@ -25,6 +25,7 @@ import Invoice from "./Invoice";
 import { ICreateInvoiceResponse } from "../../../@types/response/invoice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { formatMoney } from "../../../utils/money";
 
 interface PaymentModalProps {
   onHide: () => void;
@@ -118,6 +119,11 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
     (state) => state.reservations
   );
 
+  const caculateMoney = () =>
+    info.orderDetails
+      .map((o) => o.price * o.quantity)
+      .reduce((a, b) => a + b, 0);
+
   const handleCreateInvoice = async () => {
     const query: ICreateInvoiceQuery = {
       paymentMethod,
@@ -172,7 +178,7 @@ const PaymentModal: FunctionComponent<PaymentModalProps> = ({
         <Divider></Divider>
         <Flex justify="space-between" className="py-1">
           <strong>Total:</strong>
-          <strong>{info.totalPrice}</strong>
+          <strong>{formatMoney(caculateMoney())}</strong>
         </Flex>
         <Flex justify="space-between" className="py-1">
           <strong>Payment method:</strong>

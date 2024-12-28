@@ -9,6 +9,7 @@ import {
   removeDish,
 } from "../../../../redux/client/clientSectionSlice";
 import { message } from "antd";
+import { formatMoney } from "../../../../utils/money";
 
 interface DishItemProps {
   dish: Dish;
@@ -29,7 +30,7 @@ const DishItem: FunctionComponent<DishItemProps> = ({ dish }) => {
   return (
     <div className="relative" id="dish-item" key={`dish-item-${dish.dishId}`}>
       <h2 id="dish-item-title">{dish.dishName}</h2>
-      <p>{dish.currentPrice}</p>
+      <p>{formatMoney(dish.currentPrice)}</p>
       <div className="flex justify-center">
         {hasDishAdded() ? (
           <button

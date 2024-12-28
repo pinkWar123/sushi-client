@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTty } from "@fortawesome/free-solid-svg-icons";
 import { PATH } from "../../../constants/paths";
+import { formatMoney } from "../../../utils/money";
 
 interface CartModalProps {
   onClose: () => void;
@@ -58,7 +59,9 @@ const CartModal: FunctionComponent<CartModalProps> = ({ onClose }) => {
           <div className="flex justify-between py-2">
             <strong className="text-lg">{selectedDish.dish.dishName}</strong>
             <strong className="flex items-center">
-              {selectedDish.dish.currentPrice * selectedDish.quantity}
+              {formatMoney(
+                selectedDish.dish.currentPrice * selectedDish.quantity
+              )}
             </strong>
           </div>
           <div className="flex justify-between py-2">

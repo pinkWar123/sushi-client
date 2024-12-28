@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { PUBLIC_ROUTES } from "./routes";
 import { Loading } from "../components/Loading";
 
@@ -12,7 +12,7 @@ export const AppRoutes = () => {
       <HelmetProvider context={helmetContext}>
         <Helmet>
           <meta charSet="utf-8" />
-          <title>React TS Boilerplate</title>
+          <title>Paradise Sushi</title>
           <link
             rel="canonical"
             href="https://reactts-boilerplate.netlify.app/"
@@ -21,6 +21,7 @@ export const AppRoutes = () => {
 
         <Suspense fallback={<Loading />}>
           <Routes>
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
             {PUBLIC_ROUTES.map((group) => (
               <Route
                 key={`route-${group.path}`}
