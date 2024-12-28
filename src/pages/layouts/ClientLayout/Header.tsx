@@ -35,7 +35,7 @@ const Header: React.FC = () => {
     <div className="Header">
       <nav className="navbar">
         <div className="logo-container">
-          <a href="#">
+          <a href="/welcome">
             <img src={logo} alt="Logo" className="logo-img" />
           </a>
         </div>
@@ -44,13 +44,13 @@ const Header: React.FC = () => {
             <a href="#home">Home</a>
           </li>
           <li className="box">
-            <a href="#about">About</a>
+            <a href="/welcome#about">About</a>
           </li>
           <li className="box">
-            <a href="#menu">Menu</a>
+            <a href="/welcome#menu">Menu</a>
           </li>
           <li className="box">
-            <a href="#booking">Booking</a>
+            <a href="/welcome#booking">Booking</a>
           </li>
           {!isAuthenticated() && (
             <li className="box">
