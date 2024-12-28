@@ -84,7 +84,10 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                       : "text-blue-500"
                   }`}
                 >
-                  {user?.rank?.charAt(0).toUpperCase() + user?.rank?.slice(1)}
+                  {user.rank === null
+                    ? "Unknown"
+                    : user?.rank?.charAt(0).toUpperCase() +
+                      user?.rank?.slice(1)}
                 </span>
               </div>
             </Card>

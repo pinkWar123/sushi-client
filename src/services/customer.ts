@@ -10,3 +10,18 @@ export const callGetAllCustomers = async (query: ICustomerQuery) => {
     })
   ).data;
 };
+
+interface ICreateCardCustomerQuery {
+  customerId: string;
+  employeeId: string;
+}
+export const createCardCustomer = async (query: ICreateCardCustomerQuery) => {
+  console.log("query: ", query);
+
+  const response = await axiosInstance.post(
+    `/Card/createCardForCustomer?customerId=${query.customerId}&employeeId=${query.employeeId}`
+  );
+  console.log("response: ", response.data);
+
+  return response.data;
+};
