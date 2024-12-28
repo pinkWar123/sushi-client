@@ -1,9 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ChartData, ChartOptions, ScriptableContext } from "chart.js";
 import { callGetBranchRevenueByDateRange } from "../services/branch";
+import dayjs from "dayjs";
+import { ITopDishesQuery } from "../@types/request/request";
+import {
+  callGetTop5BestDishes,
+  callGetTop5WorstDishes,
+} from "../services/dish";
+import { ITopDishResponse } from "../@types/response/dish";
 
 export interface IBranchState {
   revenue: ChartData<"line", number[], string>;
+  dishes: {
+    worst: ITopDishResponse;
+    best: ITopDishResponse;
+  };
   options: ChartOptions<"line">;
   loading: boolean;
 }
@@ -82,6 +93,10 @@ const initialState: IBranchState = {
     },
   },
   loading: false,
+  dishes: {
+    best: [],
+    worst: [],
+  },
 };
 
 interface IGetRevenueByDateRange {
@@ -102,6 +117,22 @@ export const getRevenueByDateRange = createAsyncThunk(
   }
 );
 
+export const getTopDishesByDateRange = createAsyncThunk(
+  "get-top-dishes",
+  async (query: ITopDishesQuery) => {
+    const res = await callGetTop5BestDishes(query);
+    return res.data;
+  }
+);
+
+export const getWorstDishesByDateRange = createAsyncThunk(
+  "get-worst-dishes",
+  async (query: ITopDishesQuery) => {
+    const res = await callGetTop5WorstDishes(query);
+    return res.data;
+  }
+);
+
 const branchSlice = createSlice({
   name: "branch",
   initialState,
@@ -116,12 +147,23 @@ const branchSlice = createSlice({
         state.revenue.datasets[0].data = data.map(
           (revenue) => revenue.totalRevenue
         );
-        state.revenue.labels = data.map((revenue) => revenue.revenueDate);
+        state.revenue.labels = data.map((revenue) =>
+          dayjs(revenue.revenueDate).format("DD-MM-YYYY").toString()
+        );
         state.loading = false;
       })
       .addCase(getRevenueByDateRange.rejected, (state) => {
         state.loading = false;
       });
+
+    builder.addCase(getTopDishesByDateRange.fulfilled, (state, action) => {
+      const dishes = action.payload;
+      state.dishes.best = [...dishes];
+    });
+    builder.addCase(getWorstDishesByDateRange.fulfilled, (state, action) => {
+      const dishes = action.payload;
+      state.dishes.worst = [...dishes];
+    });
   },
 });
 

@@ -9,13 +9,15 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import NotFound from "../../ErrorPages/NotFound";
 import { PATH } from "../../../constants/paths";
 import { useAppSelector } from "../../../hooks/redux";
-
+import logo from "../../../assets/icon/logo.png";
+import "../ClientLayout/Header.css";
 interface HeaderProps {}
 
 const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
   const [branchNames, setBranchNames] = useState<BranchNameDto[]>([]);
   const { branchId } = useParams();
   const { name } = useAppSelector((state) => state.account);
+  console.log(name);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchBranches = async () => {
@@ -49,9 +51,13 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
     <Header className="bg-neutral-50">
       <Flex justify="space-between">
         <Space>
-          <strong className=" ">Foody.io</strong>
+          <div className="logo-container">
+            <a href="/welcome">
+              <img src={logo} alt="Logo" className="logo-img" />
+            </a>
+          </div>
           <div className="flex items-center">
-            <Select
+            {/* <Select
               options={branchNames.map((branch) => ({
                 label: <div>{branch.name}</div>,
                 value: branch.branchId,
@@ -59,12 +65,12 @@ const DashboardLayoutHeader: FunctionComponent<HeaderProps> = () => {
               value={branchId}
               onChange={(value) => handleNavigate(value)}
               placeholder="Choose a branch..."
-            />
+            /> */}
           </div>
         </Space>
         <Space>
           <FontAwesomeIcon icon={faBell} />
-          <Avatar />
+          {/* <Avatar /> */}
           <strong>{name}</strong>
         </Space>
       </Flex>

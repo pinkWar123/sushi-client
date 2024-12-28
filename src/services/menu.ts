@@ -23,6 +23,7 @@ export const callGetDishBySections = async (sectionId: string) => {
 };
 
 export const callGetAllDishes = async (query: IDishesQuery) => {
+  console.log(query);
   return (
     await dishApi.get<IPagedResponse<IDish>>("", {
       params: query,

@@ -11,6 +11,8 @@ const initialState: IUserCredentials = {
   dateOfBirth: null,
   branchId: null,
   employeeId: null,
+  rank: null,
+  point: null,
 };
 
 export const login = createAsyncThunk(
@@ -34,6 +36,18 @@ const accountSlice = createSlice({
     setUser: (state, action: PayloadAction<string>) => {
       state.userName = action.payload;
     },
+    logOut: (state) => {
+      state.userName = null;
+      state.customerId = null;
+      state.phone = null;
+      state.dateOfBirth = null;
+      state.name = null;
+      state.branchId = null;
+      state.employeeId = null;
+      state.rank = null;
+      state.point = null;
+      localStorage.removeItem("token");
+    },
   },
   extraReducers(builder) {
     builder
@@ -51,16 +65,18 @@ const accountSlice = createSlice({
           employeeId,
           branchId,
           dateOfBirth,
+          rank,
+          point,
         } = action.payload;
-        return {
-          userName,
-          name,
-          phone,
-          customerId,
-          employeeId,
-          branchId,
-          dateOfBirth,
-        };
+        state.userName = userName;
+        state.name = name;
+        state.phone = phone;
+        state.customerId = customerId;
+        state.employeeId = employeeId;
+        state.branchId = branchId;
+        state.dateOfBirth = dateOfBirth;
+        state.rank = rank;
+        state.point = point;
       })
       .addCase(getUserCredentials.rejected, () => {
         console.log("Failed");
@@ -69,4 +85,4 @@ const accountSlice = createSlice({
 });
 
 export default accountSlice.reducer;
-export const { setUser } = accountSlice.actions;
+export const { setUser, logOut } = accountSlice.actions;

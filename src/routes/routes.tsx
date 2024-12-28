@@ -37,6 +37,12 @@ export const PUBLIC_ROUTES = [
           () => import("../pages/DashboardPages/CustomerPage/CustomerPage")
         ),
       },
+      {
+        path: PATH.DASHBOARD.outlet.invoice,
+        component: lazy(
+          () => import("../pages/DashboardPages/InvoicePage/InvoicesPage")
+        ),
+      },
     ],
   },
   {
@@ -64,6 +70,23 @@ export const PUBLIC_ROUTES = [
         path: PATH.WELCOME.outlet.index,
         component: lazy(
           () => import("../pages/ClientPages/ClientDashboard/Dashboard")
+        ),
+      },
+      {
+        path: PATH.DASHBOARD.outlet.invoice,
+        component: lazy(
+          () => import("../pages/DashboardPages/InvoicePage/InvoicesPage")
+        ),
+      },
+    ],
+  },
+  {
+    path: PATH.PROFILE.path,
+    components: [
+      {
+        path: PATH.PROFILE.outlet.index,
+        component: lazy(
+          () => import("../pages/ClientPages/ProfilePage/ProfilePage")
         ),
       },
     ],

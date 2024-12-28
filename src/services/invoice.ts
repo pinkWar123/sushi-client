@@ -1,8 +1,14 @@
 import axios from "axios";
 import axiosInstance from "./axios.config";
-import { ICreateInvoiceQuery } from "../@types/request/request";
+import {
+  ICreateInvoiceQuery,
+  IUserInvoiceQuery,
+} from "../@types/request/request";
 import { IResponse } from "../@types/response/response";
-import { ICreateInvoiceResponse } from "../@types/response/invoice";
+import {
+  ICreateInvoiceResponse,
+  IUserInvoiceResponse,
+} from "../@types/response/invoice";
 
 const invoiceApi = axios.create({
   baseURL: `${axiosInstance.defaults.baseURL}/Invoice`,
@@ -22,4 +28,12 @@ export const callCreateNewInvoice = async (query: ICreateInvoiceQuery) => {
 
 export const callPurchaseInvoice = async (invoiceId: string) => {
   return (await invoiceApi.patch(`UpdatePaidInvoice/${invoiceId}`)).data;
+};
+
+export const callGetAllInvoices = async (query: IUserInvoiceQuery) => {
+  return (
+    await invoiceApi.get<IResponse<IUserInvoiceResponse>>("query", {
+      params: query,
+    })
+  ).data;
 };

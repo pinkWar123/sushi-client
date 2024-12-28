@@ -69,7 +69,6 @@ function Menu() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!branchId) return;
     dispatch(
       fetchDishes({
         sectionId: selectedSection?.sectionId,

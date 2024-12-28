@@ -17,7 +17,15 @@ export interface IDishesQuery extends IBasePaginatedQuery {
   branchId?: string;
 }
 
-export interface ICustomerQuery extends IBasePaginatedQuery {}
+export interface ITopDishesQuery {
+  branchId?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface ICustomerQuery extends IBasePaginatedQuery {
+  phoneNumber?: string;
+}
 
 export interface IDetailedReservationCardsQuery {
   branchId: string;
@@ -66,4 +74,16 @@ export interface ISurvey {
 
 export interface ICreateSurveyRequest extends ISurvey {
   invoiceId: string;
+}
+
+export interface IChangeEmployeeBranchQuery {
+  employeeId: string;
+  newBranchId: string;
+}
+
+export interface IUserInvoiceQuery {
+  branchId: string;
+  phone: string | null;
+  startDate: string;
+  endDate: string;
 }

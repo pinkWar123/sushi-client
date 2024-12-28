@@ -21,7 +21,7 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
     }
     try {
       console.log({
-        tabledId: selectedTableId,
+        TabledId: selectedTableId,
         reservationId,
         employeeId,
       });
@@ -43,11 +43,12 @@ const PlacedFooter: FunctionComponent<PlacedFooterProps> = ({
       <Col span={12}>
         <Select
           onChange={(value) => setSelectedTableId(value)}
+          value={selectedTableId}
           className="w-100"
           placeholder="Choose table..."
           options={emptyTables.map((emptyTable) => ({
             label: `Table ${emptyTable.tableNumber}`,
-            value: emptyTable.id,
+            value: emptyTable.tableId,
           }))}
         />
       </Col>

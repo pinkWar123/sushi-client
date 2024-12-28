@@ -11,4 +11,6 @@ export interface IUserCredentials {
   employeeId: string | null;
   branchId: string | null;
   dateOfBirth: string | null;
+  point: number | null;
+  rank: "Membership" | "Silver" | "Gold" | null;
 }

@@ -114,15 +114,18 @@ const reservationSlice = createSlice({
       })
       .addCase(updateReservationStatus.fulfilled, (state, action) => {
         const { tableId, reservationId } = action.payload;
+        console.log(tableId);
+        console.log(state.emptyTables.map((table) => table.tableId));
         const tableNumber =
-          state.emptyTables.find((e) => e.id === tableId)?.tableNumber ?? 0;
+          state.emptyTables.find((e) => e.tableId === tableId)?.tableNumber ??
+          0;
         state.data = state.data.map((reservation) =>
           reservation.reservationId === reservationId
             ? { ...reservation, status: reservation.status + 1, tableNumber }
             : reservation
         );
         state.emptyTables = state.emptyTables.filter(
-          (table) => table.id !== tableId
+          (table) => table.tableId !== tableId
         );
       })
       .addCase(createInvoice.fulfilled, (state) => {
@@ -151,6 +154,7 @@ const reservationSlice = createSlice({
         // );
       })
       .addCase(fetchEmptyTables.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.emptyTables = action.payload;
       });
   },

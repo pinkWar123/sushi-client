@@ -1,6 +1,7 @@
 import { faStickyNote } from "@fortawesome/free-regular-svg-icons";
 import {
   faCog,
+  faFileInvoice,
   faGauge,
   faHamburger,
   faSignOutAlt,
@@ -12,6 +13,8 @@ import { Divider, Space } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { FunctionComponent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../hooks/redux";
+import { logOut } from "../../../redux/accountSlice";
 
 interface DashboardLayoutSidebarProps {}
 
@@ -46,6 +49,10 @@ const items: NavigateItemProps[] = [
     icon: <FontAwesomeIcon icon={faUsers} />,
     title: "Customers",
   },
+  {
+    icon: <FontAwesomeIcon icon={faFileInvoice} />,
+    title: "Invoices",
+  },
 ];
 
 const NavigateItem: FunctionComponent<NavigateItemProps> = (
@@ -54,7 +61,7 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
   const navigate = useNavigate();
   return (
     <div
-      className={`py-2 cursor-pointer ${
+      className={`py-2 cursor-pointer hover:text-violet-700 ${
         props.isActive ? "text-violet-700 " : "text-zinc-400"
       }`}
       onClick={() =>
@@ -68,15 +75,15 @@ const NavigateItem: FunctionComponent<NavigateItemProps> = (
       }
     >
       <div
-        className={`h-1/2 ${
+        className={`h-1/2 hover:text-violet-700 ${
           props.isActive ? "border-r-2 border-r-violet-700" : ""
         }`}
       >
         <Space className={`ml-8`}>
           <div>{props.icon}</div>
           <div
-            className={` ${
-              props.isActive ? "text-violet-700 " : "text-zinc-400"
+            className={`hover:text-violet-700 ${
+              props.isActive ? "text-violet-700   " : "text-zinc-400"
             }`}
           >
             {props.title}
@@ -93,6 +100,12 @@ const DashboardLayoutSidebar: FunctionComponent<
   const location = useLocation();
   const pathSegments = location.pathname.split("/");
   const lastSegment = pathSegments[pathSegments.length - 1];
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const handleLogOut = () => {
+    dispatch(logOut());
+    navigate("/welcome");
+  };
   return (
     <Sider
       className="bg-neutral-50 start-0 h-screen fixed top-18 "
@@ -104,18 +117,17 @@ const DashboardLayoutSidebar: FunctionComponent<
           isActive={item.title.toLowerCase() === lastSegment}
         />
       ))}
-      <div className=" mt-40">
+      <div className="mt-40">
         <Divider />
-        <div className="py-2 cursor-pointer">
+        <div
+          className="py-2 cursor-pointer text-zinc-400 hover:text-violet-700"
+          onClick={() => handleLogOut()}
+        >
           <Space className="ml-8">
-            <FontAwesomeIcon className="text-zinc-400" icon={faCog} />
-            <div className="text-zinc-400">Settings</div>
-          </Space>
-        </div>
-        <div className="py-2 cursor-pointer">
-          <Space className="ml-8">
-            <FontAwesomeIcon className="text-zinc-400" icon={faSignOutAlt} />
-            <div className="text-zinc-400">Log out</div>
+            <div>
+              <FontAwesomeIcon icon={faSignOutAlt} />
+            </div>
+            <div className="text-zinc-400 hover:text-violet-700">Log out</div>
           </Space>
         </div>
       </div>

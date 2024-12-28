@@ -3,12 +3,13 @@ import "./Header.css";
 import { Link } from "react-router-dom";
 
 import logo from "../../../assets/icon/logo.png";
-import { Badge } from "antd";
+import { Badge, message } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { useAppSelector } from "../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import CartModal from "./CartModal";
 import { PATH } from "../../../constants/paths";
+import { logOut } from "../../../redux/accountSlice";
 
 const Header: React.FC = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -18,12 +19,23 @@ const Header: React.FC = () => {
   const { name, branchId, employeeId } = useAppSelector(
     (state) => state.account
   );
-  console.log(name);
+  const dispatch = useAppDispatch();
+
+  const isAuthenticated = () => {
+    if (name || branchId || employeeId) return true;
+    return false;
+  };
+
+  const handleLogOut = () => {
+    dispatch(logOut());
+    message.success("Log out completed");
+  };
+
   return (
     <div className="Header">
       <nav className="navbar">
         <div className="logo-container">
-          <a href="#">
+          <a href="/welcome">
             <img src={logo} alt="Logo" className="logo-img" />
           </a>
         </div>
@@ -32,22 +44,34 @@ const Header: React.FC = () => {
             <a href="#home">Home</a>
           </li>
           <li className="box">
-            <a href="#about">About</a>
+            <a href="/welcome#about">About</a>
           </li>
           <li className="box">
-            <a href="#menu">Menu</a>
+            <a href="/welcome#menu">Menu</a>
           </li>
           <li className="box">
-            <a href="#booking">Booking</a>
+            <a href="/welcome#booking">Booking</a>
           </li>
-          {!name && (
+          {!isAuthenticated() && (
             <li className="box">
               <Link to="/register">Register</Link>
             </li>
           )}
-          {!name && (
+          {!isAuthenticated() && (
             <li className="box">
               <Link to="/login">Login</Link>
+            </li>
+          )}
+          {isAuthenticated() && (
+            <li className="box">
+              <Link to={"#"} onClick={handleLogOut}>
+                Logout
+              </Link>
+            </li>
+          )}
+          {isAuthenticated() && !employeeId && (
+            <li className="box">
+              <Link to={"/profile"}>Profile</Link>
             </li>
           )}
           {name && <strong>Welcome {name} !</strong>}

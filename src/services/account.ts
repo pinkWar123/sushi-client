@@ -6,11 +6,10 @@ import { ILoginResponse, IUserCredentials } from "../@types/response/account";
 
 const accountApi = axios.create({
   baseURL: `${axiosInstance.defaults.baseURL}/account`,
-  ...axiosInstance.defaults,
 });
 
 export const callRegister = async (request: IRegisterRequest) => {
-  return (await accountApi.post("register", request)).data;
+  return (await accountApi.post("Register", request)).data;
 };
 
 export const callLogin = async (request: ILoginRequest) => {

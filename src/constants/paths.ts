@@ -8,6 +8,7 @@ export const PATH = {
       order: "orders",
       employee: "employee",
       customer: "customers",
+      invoice: "invoices",
     },
   },
   LOGIN: {
@@ -18,6 +19,12 @@ export const PATH = {
   },
   REGISTER: {
     path: "register",
+    outlet: {
+      index: "",
+    },
+  },
+  PROFILE: {
+    path: "profile",
     outlet: {
       index: "",
     },
