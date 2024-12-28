@@ -83,7 +83,7 @@ export interface IChangeEmployeeBranchQuery {
 
 export interface IUserInvoiceQuery {
   branchId: string;
-  customerName?: string;
+  phone: string | null;
   startDate: string;
   endDate: string;
 }

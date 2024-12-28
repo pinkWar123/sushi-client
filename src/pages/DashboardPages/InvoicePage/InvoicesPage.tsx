@@ -3,6 +3,7 @@ import {
   DatePicker,
   Form,
   Input,
+  message,
   Table,
   TableProps,
   TimeRangePickerProps,
@@ -19,6 +20,7 @@ import { IUserInvoiceQuery } from "../../../@types/request/request";
 import {
   faMoneyBillTrendUp,
   faMoneyBillWave,
+  faPhone,
   faSignal,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,6 +52,7 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [form] = Form.useForm<IUserInvoiceQuery>();
+  const [loading, setLoading] = useState<boolean>(false);
   const columns: TableProps<IUserInvoice>["columns"] = [
     {
       title: (
@@ -68,6 +71,15 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
       ),
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: (
+        <p>
+          <FontAwesomeIcon icon={faPhone} /> Phone number
+        </p>
+      ),
+      dataIndex: "phone",
+      key: "phone",
     },
     {
       title: (
@@ -157,35 +169,42 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
   ];
 
   const fetchInvoices = useCallback(async () => {
-    console.log("re render");
+    setLoading(true);
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
-    const customerName = searchParams.get("customerName");
-    const invoices = await callGetAllInvoices({
-      branchId: branchId ?? "",
-      startDate: startDate || initialDates[0],
-      endDate: endDate || initialDates[1],
-      customerName: customerName ?? "",
-    });
-    setInvoices(invoices.data);
+    const phone = searchParams.get("phone");
+    try {
+      const invoices = await callGetAllInvoices({
+        branchId: branchId ?? "",
+        startDate: startDate || initialDates[0],
+        endDate: endDate || initialDates[1],
+        phone: phone,
+      });
+      console.log(invoices.data[0]);
+      setInvoices(invoices.data);
+    } catch (error) {
+      message.error("Failed to fetch invoices");
+    } finally {
+      setLoading(false);
+    }
   }, [location.search]);
 
   useEffect(() => {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
-    const customerName = searchParams.get("customerName");
+    const phone = searchParams.get("phone");
     console.log(initialDates[0].toString());
     form.setFieldsValue({
       branchId,
       startDate: startDate ? dayjs(startDate, "YYYY-MM-DD") : initialDates[0],
       endDate: endDate ? dayjs(endDate, "YYYY-MM-DD") : initialDates[1],
-      customerName: customerName || "",
+      phone: phone,
     });
     fetchInvoices();
   }, [fetchInvoices]);
 
   const handleSearch = () => {
-    const { customerName, startDate, endDate } = form.getFieldsValue();
+    const { phone, startDate, endDate } = form.getFieldsValue();
     if (startDate)
       searchParams.set("startDate", dayjs(startDate).format("YYYY-MM-DD"));
     else searchParams.delete("startDate");
@@ -194,8 +213,8 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
       searchParams.set("endDate", dayjs(endDate).format("YYYY-MM-DD"));
     else searchParams.delete("endDate");
 
-    if (customerName) searchParams.set("customerName", customerName);
-    else searchParams.delete("customerName");
+    if (phone) searchParams.set("phone", phone);
+    else searchParams.delete("phone");
 
     navigate({
       pathname: location.pathname,
@@ -206,8 +225,8 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
   return (
     <>
       <Form onFinish={handleSearch} method="get" layout="inline" form={form}>
-        <Form.Item name={"customerName"}>
-          <Input.Search placeholder="Customer name" />
+        <Form.Item name={"phone"}>
+          <Input.Search placeholder="Customer phone" />
         </Form.Item>
         <Form.Item label="From:" name={"startDate"}>
           <DatePicker format={"YYYY-MM-DD"} />
@@ -224,7 +243,7 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
           </button>
         </Form.Item>
       </Form>
-      <Table dataSource={invoices} columns={columns} />
+      <Table loading={loading} dataSource={invoices} columns={columns} />
     </>
   );
 };

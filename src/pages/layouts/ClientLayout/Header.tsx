@@ -69,6 +69,11 @@ const Header: React.FC = () => {
               </Link>
             </li>
           )}
+          {isAuthenticated() && !employeeId && (
+            <li className="box">
+              <Link to={"/profile"}>Profile</Link>
+            </li>
+          )}
           {name && <strong>Welcome {name} !</strong>}
           <li
             className="box flex items-center cursor-pointer"

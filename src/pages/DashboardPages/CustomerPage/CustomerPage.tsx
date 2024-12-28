@@ -142,7 +142,7 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
     setPhone(phoneNumber ?? undefined);
     const query: ICustomerQuery = {
       pageNumber: pageNumberStr !== null ? parseInt(pageNumberStr) : 1,
-      pageSize: pageSizeStr !== null ? parseInt(pageSizeStr) : 5,
+      pageSize: pageSizeStr !== null ? parseInt(pageSizeStr) : 10,
     };
     if (phoneNumber) query.phoneNumber = phoneNumber;
     const fetchCustomers = async () => {
@@ -161,7 +161,7 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
     };
 
     fetchCustomers();
-  }, []);
+  }, [location.search]);
 
   const handleSearchByPhone = () => {
     const searchParams = new URLSearchParams(location.search);
@@ -170,6 +170,16 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
     navigate({
       pathName: location.pathname,
       search: searchParams.toString(),
+    });
+  };
+
+  const handleChangePage = (pageNumber: number) => {
+    const search = new URLSearchParams(location.search);
+    search.set("pageNumber", pageNumber.toString());
+    search.set("pageSize", pagination?.pageSize?.toString() ?? "");
+    navigate({
+      pathname: location.pathname,
+      search: search.toString(),
     });
   };
 
@@ -206,7 +216,18 @@ const CustomerPage: FunctionComponent<CustomerPageProps> = () => {
         </Form.Item>
       </Flex>
       <hr className="" />
-      <Table dataSource={customers} columns={columns} {...pagination} />
+      <Table
+        onChange={(config) => {
+          handleChangePage(config?.current ?? 1);
+        }}
+        dataSource={customers}
+        columns={columns}
+        pagination={{
+          current: pagination?.pageNumber,
+          pageSize: pagination?.pageSize,
+          total: pagination?.totalRecords,
+        }}
+      />
     </div>
   );
 };

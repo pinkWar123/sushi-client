@@ -72,6 +72,23 @@ export const PUBLIC_ROUTES = [
           () => import("../pages/ClientPages/ClientDashboard/Dashboard")
         ),
       },
+      {
+        path: PATH.DASHBOARD.outlet.invoice,
+        component: lazy(
+          () => import("../pages/DashboardPages/InvoicePage/InvoicesPage")
+        ),
+      },
+    ],
+  },
+  {
+    path: PATH.PROFILE.path,
+    components: [
+      {
+        path: PATH.PROFILE.outlet.index,
+        component: lazy(
+          () => import("../pages/ClientPages/ProfilePage/ProfilePage")
+        ),
+      },
     ],
   },
   {

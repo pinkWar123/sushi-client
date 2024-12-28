@@ -11,6 +11,8 @@ const initialState: IUserCredentials = {
   dateOfBirth: null,
   branchId: null,
   employeeId: null,
+  rank: null,
+  point: null,
 };
 
 export const login = createAsyncThunk(
@@ -42,6 +44,8 @@ const accountSlice = createSlice({
       state.name = null;
       state.branchId = null;
       state.employeeId = null;
+      state.rank = null;
+      state.point = null;
       localStorage.removeItem("token");
     },
   },
@@ -61,6 +65,8 @@ const accountSlice = createSlice({
           employeeId,
           branchId,
           dateOfBirth,
+          rank,
+          point,
         } = action.payload;
         state.userName = userName;
         state.name = name;
@@ -69,6 +75,8 @@ const accountSlice = createSlice({
         state.employeeId = employeeId;
         state.branchId = branchId;
         state.dateOfBirth = dateOfBirth;
+        state.rank = rank;
+        state.point = point;
       })
       .addCase(getUserCredentials.rejected, () => {
         console.log("Failed");

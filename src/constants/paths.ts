@@ -23,6 +23,12 @@ export const PATH = {
       index: "",
     },
   },
+  PROFILE: {
+    path: "profile",
+    outlet: {
+      index: "",
+    },
+  },
   WELCOME: {
     path: "welcome",
     outlet: {
