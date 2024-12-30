@@ -1,13 +1,12 @@
 import { Modal, Select, Table, TableProps } from "antd";
 import { FunctionComponent } from "react";
 import { IOrderDetail } from "../../../@types/response/order";
-import { OrderStatus } from "../../../constants/order";
 import { formatMoney } from "../../../utils/money";
 
 interface OrderDetailProps {
   onHide: () => void;
   details: IOrderDetail[];
-  reservationId: string;
+  reservationId?: string;
 }
 interface DishProps extends IOrderDetail {}
 

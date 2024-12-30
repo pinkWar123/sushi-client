@@ -121,7 +121,7 @@ function Menu() {
       <div id="cat-detail" className="category-detail">
         <div id="cat-title">{selectedSection?.sectionName}</div>
         <div id="dish-list-manipulate">
-          <div>
+          {/* <div>
             <label htmlFor="max-price">Max price</label>
             <input
               value={maxPrice ?? ""}
@@ -148,7 +148,7 @@ function Menu() {
                 setMinPrice(parseInt(event.target.value) || undefined)
               }
             />
-          </div>
+          </div> */}
         </div>
         <div id="dish-list">
           {dishes?.map((dish) => (

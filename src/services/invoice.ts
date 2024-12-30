@@ -7,6 +7,9 @@ import {
 import { IResponse } from "../@types/response/response";
 import {
   ICreateInvoiceResponse,
+  IInvoiceDish,
+  ILastestCustomerInvoiceResponse,
+  ILastestInvoicesByOrderResponse,
   IUserInvoiceResponse,
 } from "../@types/response/invoice";
 
@@ -35,5 +38,31 @@ export const callGetAllInvoices = async (query: IUserInvoiceQuery) => {
     await invoiceApi.get<IResponse<IUserInvoiceResponse>>("query", {
       params: query,
     })
+  ).data;
+};
+
+export const callGetLatestInvoicesByCustomer = async (customerId: string) => {
+  return (
+    await invoiceApi.get<IResponse<ILastestCustomerInvoiceResponse>>(
+      "latestInvoicesByCustomer",
+      {
+        params: { customerId },
+      }
+    )
+  ).data;
+};
+
+export const callGetLastestInvoicesByOrder = async (orderId: string) => {
+  return (
+    await invoiceApi.get<IResponse<ILastestInvoicesByOrderResponse>>(
+      "latestInvoicesByOrder",
+      { params: { orderId } }
+    )
+  ).data;
+};
+
+export const callGetInvoiceDetails = async (invoiceId: string) => {
+  return (
+    await invoiceApi.get<IResponse<IInvoiceDish[]>>(`${invoiceId}/dishes`)
   ).data;
 };

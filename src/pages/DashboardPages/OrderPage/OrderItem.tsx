@@ -1,5 +1,5 @@
 import { Avatar, Card, Col, Divider, Flex, Row, Typography } from "antd";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import Status from "./Status";
 import { IReservation } from "../../../@types/response/reservation";
 import { formattedDate, formattedTime } from "../../../utils/time";
@@ -7,16 +7,34 @@ import { OrderStatus } from "../../../constants/order";
 import PlacedFooter from "./PlacedFooter";
 import InProgressFooter from "./InProgressFooter";
 import { formatMoney } from "../../../utils/money";
+import { callGetLastestInvoicesByOrder } from "../../../services/invoice";
+import { ILastestInvoicesByOrderResponse } from "../../../@types/response/invoice";
+import dayjs from "dayjs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faDollarSign,
+  faGift,
+  faTags,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendarAlt,
+  faCreditCard,
+} from "@fortawesome/free-regular-svg-icons";
 
 interface OrderItemProps {
   info: IReservation;
 }
 
 const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
-  const caculateMoney = () =>
-    info.orderDetails
-      .map((o) => o.price * o.quantity)
-      .reduce((a, b) => a + b, 0);
+  const [invoices, setInvoices] = useState<ILastestInvoicesByOrderResponse>([]);
+  useEffect(() => {
+    if (info.status !== OrderStatus.Done) return;
+    const fetchInvoices = async () => {
+      const res = await callGetLastestInvoicesByOrder(info.orderId);
+      setInvoices(res.data);
+    };
+    fetchInvoices();
+  }, []);
   return (
     <>
       <Card>
@@ -98,10 +116,66 @@ const OrderItem: FunctionComponent<OrderItemProps> = ({ info }) => {
             </span>
           )}
         </Divider>
-        <Flex justify="space-between">
-          <div className="font-bold">Total</div>
-          <div className="font-bold">{formatMoney(caculateMoney())}</div>
-        </Flex>
+        {invoices.length > 0 && (
+          <>
+            <div className="space-y-4 p-4 bg-white shadow-md rounded-lg">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={faDollarSign}
+                    className="text-green-500"
+                  />
+                  <span className="font-bold">Total</span>
+                </div>
+                <span className="font-bold">
+                  {formatMoney(invoices[0].total)}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={faCreditCard}
+                    className="text-blue-500"
+                  />
+                  <span className="font-bold">Payment Method</span>
+                </div>
+                <span className="font-bold">{invoices[0].paymentMethod}</span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon icon={faTags} className="text-red-500" />
+                  <span className="font-bold">After Discount</span>
+                </div>
+                <span className="font-bold">
+                  {formatMoney(invoices[0].afterDiscount)}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon icon={faGift} className="text-purple-500" />
+                  <span className="font-bold">Bonus Point</span>
+                </div>
+                <span className="font-bold">{invoices[0].bonusPoint}</span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon
+                    icon={faCalendarAlt}
+                    className="text-gray-500"
+                  />
+                  <span className="font-bold">Date</span>
+                </div>
+                <span className="font-bold">
+                  {dayjs(invoices[0].datedOn).format("MMM DD, YYYY")}
+                </span>
+              </div>
+            </div>
+          </>
+        )}
 
         <Row gutter={16} className="mt-4" justify="center">
           {info.status === OrderStatus.Placed && (
