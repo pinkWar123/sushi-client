@@ -154,7 +154,7 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
         let icon;
         let colorClass;
 
-        switch (value) {
+        switch (value.toLowerCase()) {
           case "credit":
             icon = faCreditCard;
             colorClass = "text-blue-500";
@@ -171,7 +171,8 @@ const InvoicesPage: FunctionComponent<InvoicesPageProps> = () => {
         return (
           <span className={`flex items-center ${colorClass}`}>
             <FontAwesomeIcon icon={icon} className="mr-2" />
-            {(value === "credit" || value === "cash") &&
+            {(value.toLowerCase() === "credit" ||
+              value.toLowerCase() === "cash") &&
               value.charAt(0).toUpperCase() + value.slice(1)}
           </span>
         );
